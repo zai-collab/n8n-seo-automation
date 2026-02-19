@@ -1,0 +1,371 @@
+{
+  "name": "keyword_research_workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        80
+      ],
+      "id": "a404e4db-b39a-4a92-b21b-68f22e4be2bc"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "seedKeyword",
+              "value": "ai music generator"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Seed Keyword",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        272,
+        80
+      ],
+      "id": "9c55c9b1-eef9-426d-8daf-f7ea6505aff1"
+    },
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "requestMethod": "POST",
+        "url": "https://api.dataforseo.com/v3/keywords_data/google_ads/keywords_for_keywords/live",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "=[\n  {\n    \"keywords\": [\"{{ $json.seedKeyword }}\"]\n  }\n]"
+      },
+      "name": "HTTP Request to Keyword API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        512,
+        80
+      ],
+      "id": "fa648746-fd25-4085-8948-923b702c648f",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "4UFJhFhvARKFsbUZ",
+          "name": "DataForSEO Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const keywords = $input.item.json.tasks[0].result.map(rst => ({\n  keyword: rst.keyword,\n  search_volume: rst.search_volume,\n  cpc: rst.cpc,\n  competition: rst.competition\n}));\n\nreturn keywords;"
+      },
+      "name": "Extract Keywords",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        704,
+        80
+      ],
+      "id": "a00b1b85-bc32-485e-a80c-a0c7d81909b7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"search_volume\"] }}",
+              "operation": "larger",
+              "value2": 1000
+            },
+            {
+              "value1": "={{ $json[\"cpc\"] }}",
+              "operation": "larger",
+              "value2": 1
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json[\"competition\"] }}",
+              "operation": "notEqual",
+              "value2": "HIGH"
+            }
+          ]
+        }
+      },
+      "name": "Filter Volume",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        912,
+        80
+      ],
+      "id": "fd35caec-5698-4946-bdb9-da0a82f88162"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Prepare data for GPT\nconst keywordData = $input.all().map(item => {\n  return {\n    keyword: item.json.keyword,\n    volume: item.json.search_volume,\n    cpc: item.json.cpc\n  };\n});\n\nreturn [{ json: { keywordData: JSON.stringify(keywordData) } }];"
+      },
+      "name": "Prepare for GPT",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        64,
+        384
+      ],
+      "id": "427fbe53-9838-41f8-af14-7c828288f703"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "=You are an SEO expert that clusters keywords into structured JSON. Always return valid JSON only, no markdown."
+            },
+            {
+              "content": "=Cluster these keywords:  {{$json.keywordData}}  Group by search intent and semantic similarity. Return this schema: {   \"clusters\": [     {       \"cluster\": \"string\",       \"intent\": \"informational\ncommercial\ntransactional\nnavigational\",       \"keywords\": [{\"keyword\":\"string\",\"search_volume\":number,\"cpc\":number}] }"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "name": "GPT Clustering",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        272,
+        384
+      ],
+      "id": "4ca319a6-614b-45ac-ba9e-176dcc94299e",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const response = $json.message.content;\nreturn [{ json: { result: JSON.parse(response) } }];"
+      },
+      "id": "502a11a6-a079-4ec5-a72c-6d8b6e0f3402",
+      "name": "Format GPT Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        512,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Input Setup",
+        "height": 280,
+        "width": 420,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a1ef98cf-ffb3-4b4c-9fe0-f79da98ba40f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## API Call & Filter:",
+        "height": 280,
+        "width": 620,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "758dfa3d-a7ed-4381-8f38-53c59659f43b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AI Analysis",
+        "height": 280,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        304
+      ],
+      "id": "0b87811c-3bc0-40aa-ae67-0f3054e97dfa",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Sheet Output",
+        "height": 280,
+        "width": 412,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        304
+      ],
+      "id": "136a4689-6cd5-41d8-9bfe-27c8597c8abc",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://web:8000/api/v1/keyword-research-webhook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Webhook-Token",
+              "value": "={{ $env.WEBHOOK_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "seed_keyword",
+              "value": "={{ $node[\"Set Seed Keyword\"].json.seedKeyword }}"
+            },
+            {
+              "name": "clusters",
+              "value": "={{ JSON.stringify($json.result.clusters) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        720,
+        384
+      ],
+      "id": "055ff58d-b9a3-4c19-be5e-9d76fff8e48b",
+      "name": "Post to Django"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Seed Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Seed Keyword": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Keyword API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Keyword API": {
+      "main": [
+        [
+          {
+            "node": "Extract Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Keywords": {
+      "main": [
+        [
+          {
+            "node": "Filter Volume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Volume": {
+      "main": [
+        [
+          {
+            "node": "Prepare for GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for GPT": {
+      "main": [
+        [
+          {
+            "node": "GPT Clustering",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT Clustering": {
+      "main": [
+        [
+          {
+            "node": "Format GPT Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format GPT Response": {
+      "main": [
+        [
+          {
+            "node": "Post to Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "543d7f88-bc57-431e-b84f-14c8fd529e78",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
+  },
+  "id": "SF3NCk0pLPqfhawA",
+  "tags": []
+}
