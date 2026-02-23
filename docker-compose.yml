@@ -12,5 +12,30 @@ services:
       - n8n_data:/home/node/.n8n
     restart: unless-stopped
 
+  web:
+    build:
+      context: ./web
+    ports:
+      - 8000:8000
+    volumes:
+      - ./web:/app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-web}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
 volumes:
   n8n_data:
