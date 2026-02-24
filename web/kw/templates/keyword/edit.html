@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{% if keyword %}Edit keyword{% else %}New keyword{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="section-title">
+    {% if keyword %}Edit keyword{% else %}Create keyword{% endif %}
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div style="margin-bottom:12px;">
+      <div class="label" style="margin-bottom: 8px;">Cluster</div>
+      <select name="cluster_id" required>
+        <option value="">Select cluster</option>
+        {% for cluster in clusters %}
+        <option value="{{ cluster.id }}"
+          {% if keyword and keyword.cluster.id == cluster.id %}selected{% endif %}>
+          {{ cluster.name }} ({{ cluster.seed_keyword }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div class="label" style="margin-bottom: 8px;">Keyword</div>
+      <input type="text" name="keyword" value="{{ keyword.keyword|default_if_none:'' }}" required>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div class="label" style="margin-bottom: 8px;">Search volume</div>
+      <input type="number" name="search_volume" value="{{ keyword.search_volume|default_if_none:'' }}" min="0">
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div class="label" style="margin-bottom: 8px;">CPC</div>
+      <input type="number" step="0.01" name="cpc" value="{{ keyword.cpc|default_if_none:'' }}" min="0">
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div class="label" style="margin-bottom: 8px;">Competition</div>
+      <input type="text" name="competition" value="{{ keyword.competition|default_if_none:'' }}" placeholder="LOW or MEDIUM or HIGH">
+    </div>
+
+    <div class="row">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn secondary" href="{% url 'kw:keyword_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

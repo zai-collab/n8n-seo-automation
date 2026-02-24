@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Keywords{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="section-title">Keywords</div>
+
+  <div class="row" style="margin-bottom:14px; justify-content:space-between;">
+    <form method="get" class="row" style="gap:8px;">
+      <input type="text" name="query" value="{{ query }}" placeholder="Search keyword">
+      {% if clusters %}
+        <select name="cluster">
+          <option value="">All clusters</option>
+          {% for cluster in clusters %}
+            <option value="{{ cluster.id }}" {% if selected_cluster and selected_cluster.id == cluster.id %}selected{% endif %}>
+              {{ cluster.name }}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+      <button class="btn secondary" type="submit">Filter</button>
+    </form>
+
+    <a class="btn" href="{% url 'kw:keyword_create' %}">+ New keyword</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Keyword</th>
+        <th>Cluster</th>
+        <th>Volume</th>
+        <th>CPC</th>
+        <th>Competition</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for keyword in page.object_list %}
+      <tr>
+        <td>{{ keyword.keyword }}</td>
+        <td class="muted">{{ keyword.cluster.name }}</td>
+        <td>{{ keyword.search_volume }}</td>
+        <td>{{ keyword.cpc }}</td>
+        <td>{{ keyword.competition }}</td>
+        <td style="text-align:right;">
+          <a class="btn secondary" href="{% url 'kw:keyword_edit' keyword.id %}">Edit</a>
+          <form method="post" action="{% url 'kw:keyword_delete' keyword.id %}" style="display:inline" onsubmit="return confirm('Delete this keyword?');">
+            {% csrf_token %}
+            <button class="btn danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="muted">Empty Data.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

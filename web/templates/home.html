@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid">
+  <div class="card">
+    <div class="label">Clusters</div>
+    <div class="value">{{ cluster_count }}</div>
+    <a class="btn" href="{% url 'kw:cluster_list' %}">Manage clusters</a>
+  </div>
+
+  <div class="card">
+    <div class="label">Keywords</div>
+    <div class="value">{{ keyword_count }}</div>
+    <a class="btn" href="{% url 'kw:keyword_list' %}">Manage keywords</a>
+  </div>
+
+  <div class="card muted">
+    <div class="label">Blog posts</div>
+    <div class="value">{{ blog_count }}</div>
+    <div class="hint">Blog CRUD can be added next.</div>
+  </div>
+</div>
+
+<div class="card quick-actions">
+  <div class="section-title">Quick actions</div>
+  <div class="row">
+    <a class="chip" href="{% url 'kw:cluster_create' %}">+ Create cluster</a>
+    <a class="chip" href="{% url 'kw:keyword_create' %}">+ Add keyword</a>
+    <a class="chip" href="/admin/">Admin</a>
+    <a class="chip" href="/api/v1/keyword-research-webhook/">Webhook endpoint</a>
+  </div>
+</div>
+
+<div class="card quick-actions" style="margin-top:24px;">
+  <div class="section-title">Keyword Research</div>
+  <form method="post" action="{% url 'kw:keyword_research' %}">
+    {% csrf_token %}
+
+    <div class="row" style="align-items:flex-end; gap:12px;">
+      <div>
+        <div class="label" style="margin-bottom: 15px;">Seed keyword</div>
+        <input type="text" name="keyword" placeholder="e.g. ai music generator" style="min-width:260px;">
+      </div>
+      <div>
+        <button class="btn" type="submit">Research</button>
+      </div>
+    </div>
+    
+    <p class="hint" style="margin-top:8px;">
+      Enter a seed keyword to jump straight to clustered results filtered by that topic.
+    </p>
+  </form>
+</div>
+{% endblock %}

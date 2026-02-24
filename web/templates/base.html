@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}App{% endblock %} | SEO Automation</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">SEO Automation</div>
+      <div class="nav">
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
+        <a href="/kw/clusters/" class="{% if request.path|slice:':12' == '/kw/clusters' %}active{% endif %}">Clusters</a>
+        <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
+        <a href="/admin/">Admin</a>
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
