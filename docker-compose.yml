@@ -7,7 +7,12 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
       - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-admin}
-      - WEBHOOK_TOKEN=${WEBHOOK_TOKEN:-aBgLzQZM9fd2lPvIVmd5IvBa6Kbxxxv3Fl8ulk7tosOaZyvBF9CwUWpESp8fhVPE}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=${N8N_BLOCK_ENV_ACCESS_IN_NODE:-false}
+      - DATA_FOR_SEO_USERNAME=${DATA_FOR_SEO_USERNAME}
+      - DATA_FOR_SEO_PASSWORD=${DATA_FOR_SEO_PASSWORD}
+      - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
+      - TEVILY_API_KEY=${TEVILY_API_KEY}
+      - WEBHOOK_TOKEN=${WEBHOOK_TOKEN}
     volumes:
       - n8n_data:/home/node/.n8n
     restart: unless-stopped
@@ -35,6 +40,14 @@ services:
       - POSTGRES_DB=${DB_NAME:-web}
     volumes:
       - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:4
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
     restart: unless-stopped
 
 volumes:
