@@ -1,0 +1,951 @@
+{
+  "name": "Blog Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=\"Generate an AI prompt for a realistic cover image about '{{ $(\"Prepare for Agent\").item.json.keyword }}'.\"",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -816,
+        1104
+      ],
+      "id": "fdc586b5-6ac3-488b-acef-01b0fe7c959f",
+      "name": "Image prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Keyword/Topic: {{ $json.keyword }}\nSearch intent: {{ $json.intent }}\nSEO title (optional): {{ $json.title }}\nMeta description (optional): {{ $json.meta_description }}\nMust cover: {{ $json.must_cover }}\nSecondary keywords: {{ $json.secondary_keywords }}\nPreferred outline (if provided): {{ $json.outline }}\nDesired chapter count: {{ $json.outline && $json.outline.length }}",
+        "options": {
+          "systemMessage": "=#Overview\nYou are an AI agent responsible for planning the sections of a blog article by using (or improving) a SERP-derived outline to the article's topic, style, and chapters.\n\n## Context\n-The blog article will vary in topic, style, and chapters depending on the request.\n-Your role is to use the openai and the tavily tool to search for relevant topics and craft a high-level, engaging table of contents.\n-The table of contents should resonate with the topic and encourage them to read the full article.\n\n## Instructions\n1. Analyse the incoming information, including the blog article topic, style, and chapters details.\n2. Use the \"tavily\" tool to research relevant and trending subtopics related to the main newsletter topic.\n3. Based on your findings, create a table of contents with high-level, engaging topics tailored to the style.\n4. Ensure the topics align with the article's tone and are structured to maintain the reader's interest.\n5. Include brief descriptions for each section if requested.\n6. Prefer the provided outline. If the outline is empty, create one. Do not exceed the requested number of chapters.\n\n## Tools\n- tavily tool for internet research\n- openai model\n- Predefined audience profiles (if provided)\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -800,
+        352
+      ],
+      "id": "582367cd-6d92-4f1d-bf55-e20b671171f9",
+      "name": "Table of Contents"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You will receive a SERP-derived outline and SEO constraints. Convert it into an array called \"blogSections\".\nEach blogSections item must include: title (use h2), description (1-2 sentences), and subheadings (array from h3).\nKeep the tone aligned with intent: {{ $(\"Prepare for Agent\").item.json.intent }} and topic: {{ $(\"Prepare for Agent\").item.json.keyword }}.\nAlso weave in must_cover and secondary_keywords naturally across sections.\n\nSERP outline: {{ $(\"Prepare for Agent\").item.json.outline }}\nMust cover: {{ $(\"Prepare for Agent\").item.json.must_cover }}\nSecondary keywords: {{ $(\"Prepare for Agent\").item.json.secondary_keywords }}\n\nIf SERP outline is empty, create a sensible outline first.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -480,
+        352
+      ],
+      "id": "b01c5419-09ec-48b7-a376-7b9113c22a95",
+      "name": "Create the Sections",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=blog sections (array):\n{{ JSON.stringify($json.sections) }}\n\nBlog intent/style: {{ $(\"Prepare for Agent\").item.json.intent }}\nPrimary keyword/topic: {{ $(\"Prepare for Agent\").item.json.keyword }}\nMust cover (global): {{ $(\"Prepare for Agent\").item.json.must_cover }}\nSecondary keywords (global): {{ $(\"Prepare for Agent\").item.json.secondary_keywords }}\n",
+        "options": {
+          "systemMessage": "=# Overview\nYou will receive \"blog sections\" as a JSON array. Each item has:\n- title (H2)\n- description (1-2 sentences)\n- subheadings (H3 array)\n\nYour job is to write ONE complete blog article in HTML for this single brief (one n8n item).\n\n## Output rules\n- Output ONLY HTML (no markdown, no explanations).\n- Do NOT include a separate title/intro before the first H2.\n- For each blogSections item:\n  - Write <h2>{title}</h2>\n  - Expand description into useful, intent-matched content.\n  - For each subheading: write <h3> and expand with detailed paragraphs.\n- Seamlessly integrate \"must_cover\" and \"secondary_keywords\" across the article (avoid keyword stuffing).\n- Use the tavily tool to research and include inline citations as HTML links:\n  <a href=\"[URL]\">[Source: Publication]</a>\n- Ensure each major claim has an inline citation.\n- At the end, add ONE <h2>Sources</h2> section with:\n  <ul>\n    <li><a href=\"[URL]\">[Publication Name] - [Article Title]</a></li>\n  </ul>\n- Sort sources alphabetically by publication name.\n- Avoid duplicate sources. Verify links look valid.\n\n## Length\nSet the target length based on search intent:\n\n- If intent contains \"informational\": target 1600-2200 words.\n- If intent contains \"commercial\": target 1200-1800 words.\n- If intent contains \"transactional\": target 900-1400 words.\n- If multiple intents are present, use the higher range among them.\n\nHard limits:\n- Minimum 900 words total.\n- Maximum 2400 words total.\n\nToday's date is {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        80,
+        320
+      ],
+      "id": "35ca68db-e4b5-4acf-890d-e1087206823e",
+      "name": "Generate the Content"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=SEO Title (optional): {{ $(\"Prepare for Agent\").item.json.title }}\nMeta description (optional): {{ $(\"Prepare for Agent\").item.json.meta_description }}\nPrimary keyword/topic: {{ $(\"Prepare for Agent\").item.json.keyword }}\nSearch intent/style: {{ $(\"Prepare for Agent\").item.json.intent }}\nMust cover: {{ $(\"Prepare for Agent\").item.json.must_cover }}\nSecondary keywords: {{ $(\"Prepare for Agent\").item.json.secondary_keywords }}\n\nDraft article HTML (from Generate the Content):\n{{ $json.output }}\n",
+        "options": {
+          "systemMessage": "=## Overview\nYou are an expert editor. You will receive a complete draft blog article in HTML.\nYour job is to improve clarity, flow, and formatting WITHOUT changing meaning.\n\n## Instructions\n1. Keep the structure: <h2>/<h3> headings and paragraphs.\n2. Do NOT add a new title or introduction before the first <h2>.\n3. Preserve ALL existing inline citations (HTML links). Do not remove them.\n4. Ensure each <h2> section has at least one inline citation link.\n5. Ensure there is exactly one \"Sources\" section at the end:\n   - <h2>Sources</h2>\n   - <ul><li><a href=\"URL\">Publication - Article Title</a></li>...</ul>\n   - Sort alphabetically by publication name.\n6. Fix obvious HTML issues (broken tags, double spaces, malformed lists).\n7. Output ONLY the final HTML. (no markdown)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -800,
+        784
+      ],
+      "id": "10dd9ad1-6d5d-43a6-a623-652a524e3f9e",
+      "name": "Content Editor"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=If an SEO title is provided, return it exactly. Otherwise create a title.\nStyle/intent: {{ $(\"Prepare for Agent\").item.json.intent }}\nSubject/keyword: {{ $(\"Prepare for Agent\").item.json.keyword }}\nProvided SEO title: {{ $(\"Prepare for Agent\").item.json.title }}\n\nHere is the blog article: {{ $json.output }}\n\n# Output format\nOutput the title in plain text, no quotation marks, and capitalize the first letter of each word.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -384,
+        784
+      ],
+      "id": "e1bf7116-2f52-4a67-a294-31ecca1de635",
+      "name": "Title Maker",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "tavily",
+        "workflowId": {
+          "__rl": true,
+          "value": "ljeE91qNMGNzfL3W",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ljeE91qNMGNzfL3W",
+          "cachedResultName": "Tavily Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "input data": "={{ $json.keyword }}"
+          },
+          "matchingColumns": [
+            "input data"
+          ],
+          "schema": [
+            {
+              "id": "input data",
+              "displayName": "input data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        512
+      ],
+      "id": "5b3830e6-207d-4952-bb9d-01e67714cdd5",
+      "name": "tavily tool"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -816,
+        512
+      ],
+      "id": "b5f2756a-4b1d-4457-988e-73b5a0c57aed",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=output a other version of the title:{{ $('Title Maker').item.json.message.content }}. Make this all lowercase and put a (-) between each word instead of the words. Call this output \"slug\". \n\nexamples:\n1: this-is-a-slug\n2: create-a-slug"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        48,
+        784
+      ],
+      "id": "31f392e2-952e-45e7-88b2-343ec47adfb7",
+      "name": "Making Slug",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=If a meta description is provided, return it exactly. Otherwise write a ~160 character meta description.\nProvided meta description: {{ $(\"Prepare for Agent\").item.json.meta_description }}\nArticle: {{ $('Content Editor').item.json.output }}\nCall this output \"description\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        464,
+        784
+      ],
+      "id": "60900ad9-1417-4ee7-873d-6bb296beea6a",
+      "name": "Article Description",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Make a short text of 100 characters max that describes what the image is about. This is the image prompt:{{ $json.message.content }} Call this output \"alt_text\".\n\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -528,
+        1104
+      ],
+      "id": "ea7741d9-5944-4120-8b00-5252a22f5062",
+      "name": "Alt_Text Maker",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Generate a photographic image to be used as the cover image for the article titled: {{ $('Title Maker').item.json.message.content }}. This is the prompt for the image: {{ $json.message.content }}, photography, realistic, sigma 85mm f/1.4.",
+        "options": {
+          "size": "1792x1024",
+          "style": "natural",
+          "returnImageUrls": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -208,
+        1104
+      ],
+      "id": "773c0bb9-8ee8-45df-af7d-e293ebe56840",
+      "name": "Generate Featured Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        1104
+      ],
+      "id": "5ff5a6e0-cd84-4932-9a08-75420a1855ce",
+      "name": "Resize Image"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        512
+      ],
+      "id": "6fa832f1-0a46-4733-b263-3adc4ece8914",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "tavily",
+        "workflowId": {
+          "__rl": true,
+          "value": "ljeE91qNMGNzfL3W",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ljeE91qNMGNzfL3W",
+          "cachedResultName": "Tavily Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "input data": "={{ $('Split Out').item.json.keyword }}"
+          },
+          "matchingColumns": [
+            "input data"
+          ],
+          "schema": [
+            {
+              "id": "input data",
+              "displayName": "input data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        272,
+        512
+      ],
+      "id": "17bcc896-53d1-4bcc-bc91-9479d931c108",
+      "name": "tavily tool1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        944
+      ],
+      "id": "d054f759-2062-4685-b9dc-353c6122be3a",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Getting The Subject Information\n",
+        "height": 236,
+        "width": 676,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        16
+      ],
+      "typeVersion": 1,
+      "id": "5616e95c-f9cb-4684-a787-770eb830cd3f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Creating The Content\n\n",
+        "height": 380,
+        "width": 1308,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "6b33675d-a0e2-424c-b027-468519e932cb",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Creating The Featured Image\n\n",
+        "height": 240,
+        "width": 980,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "7a5791f0-0587-41f6-b4ba-9c02ae9e6a9a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Uploading To Django\n\n",
+        "height": 240,
+        "width": 360,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "85e22145-707e-4b38-ab64-c0e5d76f9db2",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Adding Extra Information\n\n\n",
+        "height": 320,
+        "width": 1660,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "f01a5f16-9937-439d-9ea3-f3c151e09778",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6bb2baa2-21ab-4c52-939e-26215b7b7415",
+              "leftValue": "={{ $json.body.metadata }}",
+              "rightValue": "={{ new Date($now).toLocaleDateString(\"en-US\", { month: \"long\", day: \"numeric\", year: \"numeric\" }) }}",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        80
+      ],
+      "id": "26401e92-fa40-4400-b950-b14efc37bf60",
+      "name": "Checking Data To Publish"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const sections = $json.message.content.blogSections;\n\nreturn { json: { sections } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        480
+      ],
+      "id": "f9c87161-aa8e-4d0e-87d2-47147f5870e3",
+      "name": "Prepare for Content Generation"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog-post",
+        "authentication": "headerAuth",
+        "options": {
+          "responseData": "success"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -848,
+        80
+      ],
+      "id": "e7447636-4b7b-48ef-819e-fe5c31f8985c",
+      "name": "Webhook",
+      "webhookId": "dd54d9a9-8f44-4cd3-b619-d3efdb890794",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items[0].json.body.metadata;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        80
+      ],
+      "id": "dd43ef19-a889-416d-ab7e-725031b9e1ad",
+      "name": "Prepare for Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://web:8000/api/v1/image-upload-webhook/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "blog_id",
+              "value": "={{ $json.blog_id }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "={{ $(\"Resize Image\").item.binary.data }}"
+            },
+            {
+              "name": "extension",
+              "value": "={{ $(\"Resize Image\").item.binary.data.fileExtension }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        1104
+      ],
+      "id": "7c366fd9-3ca1-4bfe-8df2-25f818c34193",
+      "name": "Upload Image To Web",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://web:8000/api/v1/blog-post-webhook/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $('Title Maker').item.json.message.content }}"
+            },
+            {
+              "name": "slug",
+              "value": "={{ $('Making Slug').item.json.message.content }}"
+            },
+            {
+              "name": "alt_text",
+              "value": "={{ $('Alt_Text Maker').item.json.message.content }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('Content Editor').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        1104
+      ],
+      "id": "9b146e87-67b1-4140-b5d9-77f372997818",
+      "name": "Upload Blog",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Image prompt": {
+      "main": [
+        [
+          {
+            "node": "Alt_Text Maker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Table of Contents": {
+      "main": [
+        [
+          {
+            "node": "Create the Sections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create the Sections": {
+      "main": [
+        [
+          {
+            "node": "Prepare for Content Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate the Content": {
+      "main": [
+        [
+          {
+            "node": "Content Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Editor": {
+      "main": [
+        [
+          {
+            "node": "Title Maker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Title Maker": {
+      "main": [
+        [
+          {
+            "node": "Making Slug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tavily tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Table of Contents",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Table of Contents",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Making Slug": {
+      "main": [
+        [
+          {
+            "node": "Article Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article Description": {
+      "main": [
+        [
+          {
+            "node": "Image prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alt_Text Maker": {
+      "main": [
+        [
+          {
+            "node": "Generate Featured Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Featured Image": {
+      "main": [
+        [
+          {
+            "node": "Resize Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate the Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tavily tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Generate the Content",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Editor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checking Data To Publish": {
+      "main": [
+        [
+          {
+            "node": "Prepare for Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Content Generation": {
+      "main": [
+        [
+          {
+            "node": "Generate the Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Checking Data To Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Agent": {
+      "main": [
+        [
+          {
+            "node": "Table of Contents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image To Web": {
+      "main": [
+        []
+      ]
+    },
+    "Upload Blog": {
+      "main": [
+        [
+          {
+            "node": "Upload Image To Web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7c30bad5-a812-4892-aa8e-ebdbbc7fad31",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
+  },
+  "id": "RGAg4sxUInMmmvqQ",
+  "tags": []
+}

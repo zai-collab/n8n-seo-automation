@@ -11,7 +11,7 @@ services:
       - DATA_FOR_SEO_USERNAME=${DATA_FOR_SEO_USERNAME}
       - DATA_FOR_SEO_PASSWORD=${DATA_FOR_SEO_PASSWORD}
       - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
-      - TEVILY_API_KEY=${TEVILY_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
       - WEBHOOK_TOKEN=${WEBHOOK_TOKEN}
     volumes:
       - n8n_data:/home/node/.n8n
