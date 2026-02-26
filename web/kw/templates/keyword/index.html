@@ -32,6 +32,7 @@
         <th>Volume</th>
         <th>CPC</th>
         <th>Competition</th>
+        <th>Analyzed</th>
         <th></th>
       </tr>
     </thead>
@@ -43,8 +44,13 @@
         <td>{{ keyword.search_volume }}</td>
         <td>{{ keyword.cpc }}</td>
         <td>{{ keyword.competition }}</td>
+        <td>{{ keyword.is_analyzed }}</td>
         <td style="text-align:right;">
           <a class="btn secondary" href="{% url 'kw:keyword_edit' keyword.id %}">Edit</a>
+          <form method="post" action="{% url 'kw:keyword_analyze' keyword.id %}" style="display:inline" onsubmit="return confirm('Analyze this keyword?');">
+            {% csrf_token %}
+            <button class="btn primary" type="submit">Analyze</button>
+          </form>
           <form method="post" action="{% url 'kw:keyword_delete' keyword.id %}" style="display:inline" onsubmit="return confirm('Delete this keyword?');">
             {% csrf_token %}
             <button class="btn danger" type="submit">Delete</button>

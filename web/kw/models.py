@@ -20,8 +20,10 @@ class Keyword(models.Model):
 
   keyword = models.CharField(max_length=255, db_index=True)
   search_volume = models.IntegerField()
-  cpc = models.DecimalField(max_digits=10, decimal_places=2)
+  cpc = models.FloatField()
   competition = models.CharField(max_length=16, db_index=True)
+
+  is_analyzed = models.BooleanField(default=False)
 
   created_at = models.DateTimeField(auto_now_add=True)
 
@@ -30,3 +32,15 @@ class Keyword(models.Model):
 
   def __str__(self):
     return self.keyword
+
+  def serialize(self):
+    return {
+      "id": self.id,
+      "keyword": self.keyword,
+      "search_volume": self.search_volume,
+      "cpc": self.cpc,
+      "competition": self.competition,
+      "is_analyzed": self.is_analyzed,
+      "created_at": self.created_at.isoformat(),
+    }
+    

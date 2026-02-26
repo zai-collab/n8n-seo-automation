@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Metadata{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="section-title">Metadata</div>
+  <div class="row" style="margin-bottom:14px; justify-content:space-between;">
+    <div class="row">
+      <form method="get" class="row">
+        <input type="text" name="query" value="{{ query }}" placeholder="Search by title or description or intent">
+        <button class="btn secondary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Intent</th>
+        <th>Keyword</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for metadata in page.object_list %}
+      <tr>
+        <td>{{ metadata.title }}</td>
+        <td>{{ metadata.meta_description }}</td>
+        <td>{{ metadata.intent }}</td>
+        <td>{{ metadata.keyword.keyword }}</td>
+        <td class="muted">{{ metadata.created_at }}</td>
+        <td style="text-align:right;">
+          <form method="post" action="{% url 'blog:blog_create' metadata.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
+            {% csrf_token %}
+            <button class="btn primary" type="submit">Blog Create</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="muted">Empty Data.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row" style="justify-content:flex-end; margin-top:12px;">
+    {% if page.has_previous %}
+      <a class="btn secondary" href="?page={{ page.prev_page }}&query={{ query|urlencode }}">Prev</a>
+    {% endif %}
+  
+    <span class="muted" style="margin:0 10px;">
+      Page {{ page.number }} of {{ page.paginator.num_pages }}
+    </span>
+  
+    {% if page.has_next %}
+      <a class="btn secondary" href="?page={{ page.next_page }}&query={{ query|urlencode }}">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

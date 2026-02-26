@@ -23,5 +23,6 @@ urlpatterns = [
     path('', home, name="home"),
     path('admin/', admin.site.urls),
     path('kw/', include('kw.urls')),
+    path('blogs/', include('blog.urls')),
     path('api/v1/', include('api.urls')),
 ]

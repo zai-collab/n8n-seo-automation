@@ -15,5 +15,6 @@ urlpatterns = [
   path('keywords/<int:pk>/edit/', views.keyword_edit, name='keyword_edit'),
   path('keywords/<int:pk>/delete/', views.keyword_delete, name='keyword_delete'),
   
-  path('keywords/research', views.keyword_research, name='keyword_research'),
+  path('keywords/research/', views.keyword_research, name='keyword_research'),
+  path('keywords/<int:pk>/analyze/', views.keyword_analyze, name='keyword_analyze'),
 ]

@@ -191,3 +191,19 @@ def keyword_research(request):
   )
 
   return redirect("/")
+
+@staff_member_required
+@require_POST
+def keyword_analyze(request, pk: int):
+  keyword = get_object_or_404(Keyword, pk=pk)
+  if not keyword:
+    return redirect('/')
+
+  requests.post(
+    urljoin(os.getenv('N8N_BASE_URL'), os.getenv('N8N_KEYWORD_ANALYZE_WEBHOOK_URL')),
+    headers={"Webhook-Token": settings.WEBHOOK_TOKEN},
+    json={"keyword": keyword.serialize()},
+    timeout=15
+  )
+
+  return redirect("kw:keyword_list")

@@ -15,6 +15,7 @@
         <a href="/" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
         <a href="/kw/clusters/" class="{% if request.path|slice:':12' == '/kw/clusters' %}active{% endif %}">Clusters</a>
         <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
+        <a href="/blogs/metadata/" class="{% if request.path|slice:':15' == '/blogs/metadata' %}active{% endif %}">Metadata</a>
         <a href="/admin/">Admin</a>
       </div>
     </div>
