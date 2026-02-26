@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 
-from blog.models import Metadata
+from post.models import Metadata, Blog
 from kw.models import Cluster, Keyword
 
 
@@ -11,7 +11,7 @@ def home(request):
     "cluster_count": Cluster.objects.count(),
     "keyword_count": Keyword.objects.count(),
     "metadata_count": Metadata.objects.count(),
-    "blog_count": 0,
+    "blog_count": Blog.objects.count(),
   }
 
   return render(request, "home.html", context)

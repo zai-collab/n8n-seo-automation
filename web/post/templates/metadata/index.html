@@ -33,7 +33,7 @@
         <td>{{ metadata.keyword.keyword }}</td>
         <td class="muted">{{ metadata.created_at }}</td>
         <td style="text-align:right;">
-          <form method="post" action="{% url 'blog:blog_create' metadata.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
+          <form method="post" action="{% url 'post:blog_create' metadata.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
             {% csrf_token %}
             <button class="btn primary" type="submit">Blog Create</button>
           </form>

@@ -18,13 +18,13 @@
   <div class="card">
     <div class="label">Metadata</div>
     <div class="value">{{ metadata_count }}</div>
-    <a class="btn" href="{% url 'blog:metadata_list' %}">Manage metadata</a>
+    <a class="btn" href="{% url 'post:metadata_list' %}">Manage metadata</a>
   </div>
 
-  <div class="card muted">
+  <div class="card">
     <div class="label">Blog posts</div>
     <div class="value">{{ blog_count }}</div>
-    <div class="hint">Blog CRUD can be added next.</div>
+    <a class="btn" href="{% url 'post:blog_list' %}">Manage blogs</a>
   </div>
 </div>
 

@@ -30,3 +30,22 @@ class Metadata(models.Model):
 
   def __str__(self):
     return self.title
+
+
+class Blog(models.Model):
+  title = models.CharField(max_length=255)
+  slug = models.SlugField(max_length=255)
+  content = models.TextField(blank=True)
+
+  featured_image_path = models.CharField(max_length=1024, blank=True, default="")
+  featured_image_alt = models.TextField(blank=True, default="")
+
+  status = models.CharField(max_length=20, default="draft")
+  
+  created_at = models.DateTimeField(auto_now_add=True)
+
+  class Meta:
+    db_table = 'blogs'
+
+  def __str__(self):
+    return self.title

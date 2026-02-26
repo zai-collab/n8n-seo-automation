@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="section-title">Blog</div>
+  <div class="row" style="margin-bottom:14px; justify-content:space-between;">
+    <div class="row">
+      <form method="get" class="row">
+        <input type="text" name="query" value="{{ query }}" placeholder="Search by title">
+        <button class="btn secondary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Slug</th>
+        <th>Content</th>
+        <th>Featured Image</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for blog in page.object_list %}
+      <tr>
+        <td>{{ blog.title }}</td>
+        <td>{{ blog.slug }}</td>
+        <td>{{ blog.content|safe|truncatechars:200 }}</td>
+        <td><img src="{{ MEDIA_URL }}{{ blog.featured_image_path }}" alt="{{ blog.featured_image_alt }}" class="featured-image" /></td>
+        <td class="muted">{{ blog.created_at }}</td>
+        <td style="text-align:right;">
+          <form method="post" action="{% url 'post:blog_delete' blog.id %}" style="display:inline" onsubmit="return confirm('Delete blog?');">
+            {% csrf_token %}
+            <button class="btn danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="muted">Empty Data.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row" style="justify-content:flex-end; margin-top:12px;">
+    {% if page.has_previous %}
+      <a class="btn secondary" href="?page={{ page.prev_page }}&query={{ query|urlencode }}">Prev</a>
+    {% endif %}
+  
+    <span class="muted" style="margin:0 10px;">
+      Page {{ page.number }} of {{ page.paginator.num_pages }}
+    </span>
+  
+    {% if page.has_next %}
+      <a class="btn secondary" href="?page={{ page.next_page }}&query={{ query|urlencode }}">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
