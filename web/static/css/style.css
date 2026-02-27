@@ -59,11 +59,18 @@ a:hover {
   flex-wrap: wrap;
 }
 
-.nav a {
+.nav a,
+.nav button {
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--muted);
+}
+
+.nav button {
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .nav a.active {

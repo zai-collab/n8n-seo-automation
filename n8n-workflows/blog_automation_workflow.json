@@ -229,7 +229,7 @@
         "messages": {
           "values": [
             {
-              "content": "=output a other version of the title:{{ $('Title Maker').item.json.message.content }}. Make this all lowercase and put a (-) between each word instead of the words. Call this output \"slug\". \n\nexamples:\n1: this-is-a-slug\n2: create-a-slug"
+              "content": "=output a other version of the title:{{ $('Title Maker').item.json.message.content }}. Make this all lowercase and put a (-) between each word instead of the words.\n\nexamples:\n1: this-is-a-slug\n2: create-a-slug"
             }
           ]
         },
@@ -293,7 +293,7 @@
         "messages": {
           "values": [
             {
-              "content": "=Make a short text of 100 characters max that describes what the image is about. This is the image prompt:{{ $json.message.content }} Call this output \"alt_text\".\n\n\n"
+              "content": "=Make a short text of 100 characters max that describes what the image is about. This is the image prompt:{{ $json.message.content }}\n\n\n"
             }
           ]
         },
@@ -941,7 +941,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "7c30bad5-a812-4892-aa8e-ebdbbc7fad31",
+  "versionId": "3e6752b3-9cfe-4bfd-9997-574a10c77d62",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"

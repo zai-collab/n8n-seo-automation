@@ -1,5 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
 
 from post.models import Metadata, Blog
 from kw.models import Cluster, Keyword
@@ -15,3 +17,10 @@ def home(request):
   }
 
   return render(request, "home.html", context)
+
+
+@staff_member_required
+@require_POST
+def logout(request):
+  auth_logout(request)
+  return redirect('/')
