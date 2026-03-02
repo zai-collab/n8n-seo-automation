@@ -1,5 +1,6 @@
 import json
 import random
+from tarfile import data_filter
 import time
 
 from django.core.files.storage import default_storage
@@ -53,28 +54,41 @@ def keyword_analyze_webhook(request):
   except json.JSONDecodeError:
     return HttpResponseBadRequest("Invalid Request Body")
 
-  metadata = data.get("metadata")
+  data = data.get("data")
 
-  if not metadata:
+  if not data:
     return HttpResponseBadRequest("Missing Required Fields")
 
-  id = metadata.get("keyword_id")
-  keyword = Keyword.objects.get(pk=id)
+  for item in data:
+    id = item.get("keyword_id")
+    keyword = Keyword.objects.get(pk=id)
 
-  Metadata.objects.create(
-    title=metadata.get("title"),
-    intent=metadata.get("intent"),
-    meta_description=metadata.get("meta_description"),
-    outline=metadata.get("outline"),
-    must_cover=metadata.get("must_cover"),
-    secondary_keywords=metadata.get("secondary_keywords"),
-    keyword=keyword,
-  )
+    if not keyword:
+      return HttpResponseBadRequest("Keyword not found")
 
-  keyword.is_analyzed = True
-  keyword.save()
+    metadata = item.get("metadata")
+
+    Metadata.objects.create(
+      title=metadata.get("title"),
+      intent=metadata.get("intent"),
+      meta_description=metadata.get("meta_description"),
+      outline=metadata.get("outline"),
+      must_cover=metadata.get("must_cover"),
+      secondary_keywords=metadata.get("secondary_keywords"),
+      keyword=keyword,
+    )
+
+    keyword.is_analyzed = True
+    keyword.save()
 
   return HttpResponse("success")
+
+
+@csrf_exempt
+def keyword_analyze_cron_job_webhook(request):
+  keywords = Keyword.objects.filter(is_approved=True, is_analyzed=False)
+
+  return JsonResponse({"data": [keyword.serialize() for keyword in keywords]})
 
 
 @csrf_exempt

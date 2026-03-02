@@ -34,7 +34,6 @@ class Keyword(models.Model):
       "competition": self.competition,
       "keyword_difficulty": self.keyword_difficulty,
       "search_intent": self.search_intent,
-      "is_analyzed": self.is_analyzed,
       "created_at": self.created_at.isoformat(),
     }
     

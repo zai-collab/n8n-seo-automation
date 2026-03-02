@@ -14,7 +14,7 @@
       "typeVersion": 2.1,
       "position": [
         -752,
-        -240
+        -256
       ],
       "id": "50a0c110-c2e0-4f8e-a1bc-9f9e04397d56",
       "name": "Webhook",
@@ -28,77 +28,20 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst keyword = items[0].json.body.keyword;\n\nreturn { json: { id: keyword.id, keyword: keyword.keyword } };"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -560,
-        -240
-      ],
-      "id": "d9345577-f6a1-4377-a29e-a2583d963dc4",
-      "name": "Prepare for SERP"
-    },
-    {
-      "parameters": {
-        "mode": "combine",
-        "combineBy": "combineByPosition",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        -176,
-        -240
-      ],
-      "id": "cda5afca-9710-42d3-ba02-24efead7df96",
-      "name": "Merge"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "346eb7ab-c9d2-466a-b33a-25a0b6dfc65f",
-              "name": "locationName",
-              "value": "United States",
-              "type": "string"
-            },
-            {
-              "id": "9a878177-c81c-4f8d-ade8-065c4838de7a",
-              "name": "languageName",
-              "value": "English",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -368,
-        -240
-      ],
-      "id": "413463ba-2fc7-48be-b0b3-c61449a68214",
-      "name": "Set Config Value"
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "https://api.dataforseo.com/v3/serp/google/organic/live/regular",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBasicAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "=[{\n  \"keyword\": \"{{ $json.keyword }}\",\n  \"language_name\": \"{{ $json.languageName }}\",\n  \"location_name\": \"{{ $json.locationName }}\"\n}]",
+        "jsonBody": "=[{\n  \"keyword\": \"{{ $json.keyword }}\",\n  \"language_name\": \"{{ $json.languageName }}\",\n  \"location_name\": \"{{ $json.locationName }}\",\n  \"depth\": {{ $json.depth }}\n}]",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        16,
-        -240
+        -208,
+        -256
       ],
       "id": "d66d9ac0-d532-4dd9-85e4-856a54189798",
       "name": "SERP for Keyword",
@@ -112,31 +55,17 @@
     {
       "parameters": {
         "content": "## Getting SERP for Keywords",
-        "height": 224,
-        "width": 944
+        "height": 400,
+        "width": 1088
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         -800,
-        -304
+        -480
       ],
       "typeVersion": 1,
       "id": "1cb6769b-b722-4837-9c49-06d67eab8758",
       "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "const result = $json.tasks[0].result[0];\nconst items = result[\"items\"].map(i => ({ \n  title: i.title,\n  description: i.description,\n  url: i.url,\n  keyword: result.keyword,\n}));\n\nreturn { items };"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -736,
-        48
-      ],
-      "id": "c2faf2a2-b16b-49c8-8a20-51000b990d89",
-      "name": "Prepare for On-Page"
     },
     {
       "parameters": {
@@ -153,7 +82,7 @@
               "content": "You are an SEO SERP pattern analyzer.\n\nRules:\n- Output valid JSON only\n- Follow the schema exactly\n- No extra keys\n- No explanations\n- Do not copy titles or meta descriptions verbatim\n- Infer intent only from SERP patterns\n- Keep title under 60 characters\n- Keep meta description under 155 characters"
             },
             {
-              "content": "=KEYWORD:\n{{ $node[\"Prepare for SERP\"].json.keyword }}\n\nSERP_DATA:\n{{ JSON.stringify($json.metadata) }}\n\nTasks:\n1. Infer search intent from SERP patterns.\n2. Generate a unique SEO title.\n3. Generate a concise meta description.\n4. Build a SERP-aligned outline (5-8 H2 sections, each 0-3 H3).\n5. Extract 5-10 must_cover recurring topics.\n6. Extract 10-20 secondary keywords from recurring SERP terms.\n\nReturn ONLY:\n\n{\n  \"keyword\":\"\",\n  \"intent\":\"informational|commercial|transactional|navigational\",\n  \"title\":\"\",\n  \"meta_description\":\"\",\n  \"outline\":[\n    {\"h2\":\"\",\"h3\":[]}\n  ],\n  \"must_cover\":[],\n  \"secondary_keywords\":[]\n}"
+              "content": "=KEYWORD:\n{{ $json.keyword }}\n\nSERP_DATA:\n{{ JSON.stringify($json.metadata) }}\n\nTasks:\n1. Infer search intent from SERP patterns.\n2. Generate a unique SEO title.\n3. Generate a concise meta description.\n4. Build a SERP-aligned outline (5-8 H2 sections, each 0-3 H3).\n5. Extract 5-10 must_cover recurring topics.\n6. Extract 10-20 secondary keywords from recurring SERP terms.\n\nReturn ONLY:\n\n{\n  \"keyword\":\"\",\n  \"intent\":\"informational|commercial|transactional|navigational\",\n  \"title\":\"\",\n  \"meta_description\":\"\",\n  \"outline\":[\n    {\"h2\":\"\",\"h3\":[]}\n  ],\n  \"must_cover\":[],\n  \"secondary_keywords\":[]\n}"
             }
           ]
         },
@@ -163,7 +92,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        -32,
+        176,
         48
       ],
       "id": "564349ce-f097-472a-a1fb-54bfb1b565cc",
@@ -177,22 +106,9 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst results = items.map(item => item.json.tasks[0].result[0]);\nconst metadata = results.map(rst => rst.items[0].meta);\n\nconst combined = metadata.map((m, i) => ({ metadata: m, keyword: $items(\"Split Out\")[i].json.keyword }));\n\nconst keywords = combined.reduce((acc, item) => {\n  (acc[item.keyword] ||= []).push(item);\n  return acc;\n}, {});\n\nreturn Object.keys(keywords).map(k => ({ metadata: keywords[k] }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -208,
-        48
-      ],
-      "id": "adbcc6ed-ab7d-42f3-bd18-5499076cf121",
-      "name": "Prepare for GPT"
-    },
-    {
-      "parameters": {
         "content": "## SERP Analysis",
         "height": 224,
-        "width": 1044,
+        "width": 1236,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -203,33 +119,6 @@
       "typeVersion": 1,
       "id": "0352a6a9-913d-4cf3-9fcd-638d44c47036",
       "name": "Sticky Note1"
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = {\n  ...JSON.parse(items[0].json.output[0].content[0].text),\n  keyword_id: $items(\"Prepare for SERP\")[0].json.id\n};\nreturn { json: { data } };"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        272,
-        -240
-      ],
-      "id": "1547514c-5efb-421e-a76a-2e8c565bd761",
-      "name": "Prepare for Django"
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "items",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        -560,
-        48
-      ],
-      "id": "27e0fca7-b94d-481c-92c6-5bfe36327669",
-      "name": "Split Out"
     },
     {
       "parameters": {
@@ -245,7 +134,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -384,
+        -560,
         48
       ],
       "id": "b6d71693-1c05-4dac-b743-819de7605f96",
@@ -267,7 +156,7 @@
         "bodyParameters": {
           "parameters": [
             {
-              "name": "metadata",
+              "name": "data",
               "value": "={{ $json.data }}"
             }
           ]
@@ -277,8 +166,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        448,
-        -240
+        896,
+        48
       ],
       "id": "3bf2143c-0786-4b58-afbc-d26578176fba",
       "name": "POST to Django",
@@ -293,17 +182,397 @@
       "parameters": {
         "content": "## Result Output",
         "height": 224,
-        "width": 384,
+        "width": 548,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        208,
-        -304
+        480,
+        -16
       ],
       "typeVersion": 1,
       "id": "903de287-ffde-498f-8904-321d626a2f9a",
       "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -752,
+        -416
+      ],
+      "id": "1b87df6e-4be0-414d-9e09-0ed7319dcd8f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "346eb7ab-c9d2-466a-b33a-25a0b6dfc65f",
+              "name": "locationName",
+              "value": "United States",
+              "type": "string"
+            },
+            {
+              "id": "9a878177-c81c-4f8d-ade8-065c4838de7a",
+              "name": "languageName",
+              "value": "English",
+              "type": "string"
+            },
+            {
+              "id": "af74156d-c7d3-42ad-af01-1f5b3bb3134e",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "2f8c4256-0f70-4434-9219-bfb25d5db025",
+              "name": "keyword",
+              "value": "={{ $json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "48537e36-5b2f-4a20-a85b-e325653fa591",
+              "name": "depth",
+              "value": 10,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        -256
+      ],
+      "id": "413463ba-2fc7-48be-b0b3-c61449a68214",
+      "name": "Set Params for SERP Analyze"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f76366ec-4c81-4680-879e-74e1a4ad5064",
+              "name": "domain",
+              "value": "={{ $json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "32d81665-fb80-4d21-a367-d5995b7439be",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "e8d62f3b-f0d0-49d6-82d6-0ad125d5bfee",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "51cc9815-d768-4a98-9bd4-547e892e582c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "211b2bac-27f9-4e2a-9eaa-4b769bdb7d65",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "38eb82cf-1087-4a37-9e9d-a026fc1c7f11",
+              "name": "rank",
+              "value": "={{ $json.rank_absolute }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        48
+      ],
+      "id": "911b0729-4b7e-4674-9c8e-f21451c8874a",
+      "name": "Prepare for On-Page"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f265a82d-740f-4805-8ebf-8ac2e2c07eb0",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "organic",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        160,
+        -256
+      ],
+      "id": "fcccf71d-2d57-4e30-a587-4e24a79fc32c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all()\n  .reduce((acc, item) => {\n    const { keyword } = item.json;\n    (acc[keyword] = acc[keyword] || []).push(item.json);\n    return acc;\n  }, {});\n\nreturn Object.entries(items)\n  .map(([key, data]) => ({\n    keyword: key,\n    metadata: data,\n  }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        48
+      ],
+      "id": "adbcc6ed-ab7d-42f3-bd18-5499076cf121",
+      "name": "Prepare for GPT"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1efd9434-63e0-4ad7-b57e-aeebf3464339",
+              "name": "title",
+              "value": "={{ $json.meta.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e81b4259-4b64-4cf5-8564-2cd8e646e268",
+              "name": "description",
+              "value": "={{ $json.meta.description }}",
+              "type": "string"
+            },
+            {
+              "id": "42fb7bad-03b3-471f-b495-81660fee618d",
+              "name": "htags",
+              "value": "={{ $json.meta.htags }}",
+              "type": "object"
+            },
+            {
+              "id": "a2fdd2ea-3949-4592-8902-91483cfe8bf6",
+              "name": "internalLinksCount",
+              "value": "={{ $json.meta.internal_links_count }}",
+              "type": "number"
+            },
+            {
+              "id": "598f45c9-5d66-4dcc-92db-1adc094a53c7",
+              "name": "externalLinksCount",
+              "value": "={{ $json.meta.external_links_count }}",
+              "type": "number"
+            },
+            {
+              "id": "0e7f32b5-2ad9-4123-b813-c1f6bb9287db",
+              "name": "imageCount",
+              "value": "={{ $json.meta.images_count }}",
+              "type": "number"
+            },
+            {
+              "id": "66d18a87-4472-4309-bf2d-7b15674a4e4f",
+              "name": "titleLength",
+              "value": "={{ $json.meta.title_length }}",
+              "type": "number"
+            },
+            {
+              "id": "16c2ae78-9204-4daf-8af2-6a758f4a4c40",
+              "name": "descriptionLength",
+              "value": "={{ $json.meta.description_length }}",
+              "type": "number"
+            },
+            {
+              "id": "b60ca0ee-334b-4d3f-8bb0-6e9d9cafa927",
+              "name": "canonical",
+              "value": "={{ $json.meta.canonical }}",
+              "type": "string"
+            },
+            {
+              "id": "55d8abc0-e956-4172-8c46-7382d03b9a74",
+              "name": "follow",
+              "value": "={{ $json.meta.follow }}",
+              "type": "boolean"
+            },
+            {
+              "id": "340fc1f3-e26c-496b-9756-c3e9488dc861",
+              "name": "contentSize",
+              "value": "={{ $json.meta.content.plain_text_size }}",
+              "type": "number"
+            },
+            {
+              "id": "6cffd2b2-dca0-4ff9-a012-d67ff0a6c32e",
+              "name": "wordCount",
+              "value": "={{ $json.meta.content.plain_text_word_count }}",
+              "type": "number"
+            },
+            {
+              "id": "786e70a8-0a89-4c48-8b7c-9817f92fa886",
+              "name": "keyword",
+              "value": "={{ $(\"Set Params for SERP Analyze\").item.json.keyword }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        48
+      ],
+      "id": "86e6527d-a687-4676-a0ee-56b64baf85b2",
+      "name": "Set On-Page Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -256
+      ],
+      "id": "d2336853-3a95-4c27-84fc-fd8e033e25e2",
+      "name": "Split Out Post Data"
+    },
+    {
+      "parameters": {
+        "url": "http://web:8000/api/v1/keyword-analyze-cron-job-webhook",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -576,
+        -416
+      ],
+      "id": "ebefb795-2869-4673-822c-8cb902fce984",
+      "name": "Get Approved Keywords",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        48
+      ],
+      "id": "9a4402ae-f280-4e1d-9330-1ffcaf1dfbbe",
+      "name": "Split Out On-Page Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -256
+      ],
+      "id": "8240ab16-8269-48f9-bc21-25b137e56c4d",
+      "name": "Split Out SERP Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -416
+      ],
+      "id": "27f49e0e-94fc-415c-aa68-87d61a6c2582",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "842f9d87-8300-4012-b2f5-795e66aeed7f",
+              "name": "metadata",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "object"
+            },
+            {
+              "id": "e19f7748-902a-4baa-a996-6a5c8c49ad88",
+              "name": "keyword_id",
+              "value": "={{ $node[\"Set Params for SERP Analyze\"].json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        48
+      ],
+      "id": "d983e16b-bfb4-4906-8fc5-9bcb294f0987",
+      "name": "Set GPT Output"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        720,
+        48
+      ],
+      "id": "2b7bb0f0-b6cf-4638-8deb-96dcb4295b13",
+      "name": "Aggregate"
     }
   ],
   "pinData": {},
@@ -312,30 +581,58 @@
       "main": [
         [
           {
-            "node": "Prepare for SERP",
+            "node": "Split Out Post Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Prepare for SERP": {
+    "SERP for Keyword": {
       "main": [
         [
           {
-            "node": "Set Config Value",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Merge",
+            "node": "Split Out SERP Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Merge": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Set GPT Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On-Page Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out On-Page Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Approved Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Params for SERP Analyze": {
       "main": [
         [
           {
@@ -346,33 +643,22 @@
         ]
       ]
     },
-    "Set Config Value": {
+    "Prepare for On-Page": {
       "main": [
         [
           {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "SERP for Keyword": {
-      "main": [
-        [
-          {
-            "node": "Prepare for On-Page",
+            "node": "On-Page Request",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Prepare for On-Page": {
+    "Filter": {
       "main": [
         [
           {
-            "node": "Split Out",
+            "node": "Prepare for On-Page",
             "type": "main",
             "index": 0
           }
@@ -390,11 +676,55 @@
         ]
       ]
     },
-    "Message a model": {
+    "Set On-Page Data": {
       "main": [
         [
           {
-            "node": "Prepare for Django",
+            "node": "Prepare for GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Post Data": {
+      "main": [
+        [
+          {
+            "node": "Set Params for SERP Analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Approved Keywords": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out On-Page Data": {
+      "main": [
+        [
+          {
+            "node": "Set On-Page Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out SERP Data": {
+      "main": [
+        [
+          {
+            "node": "Filter",
             "type": "main",
             "index": 0
           }
@@ -405,29 +735,29 @@
       "main": [
         [
           {
-            "node": "On-Page Request",
+            "node": "Set Params for SERP Analyze",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Prepare for Django": {
+    "Set GPT Output": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
       "main": [
         [
           {
             "node": "POST to Django",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "On-Page Request": {
-      "main": [
-        [
-          {
-            "node": "Prepare for GPT",
             "type": "main",
             "index": 0
           }
@@ -441,7 +771,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "cc42d9d2-ee7a-4e54-8e9f-3a9cf4c82c63",
+  "versionId": "5633dcce-3c5d-4002-85db-24e09a2e016e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
