@@ -39,6 +39,15 @@ def metadata_list(request):
 
 @staff_member_required
 @require_POST
+def metadata_approve(request):
+  metadata_ids = request.POST.get('selected_metadata', '').split(',')
+  metadata = Metadata.objects.filter(pk__in=metadata_ids)
+  metadata.update(is_approved=True)
+  return redirect('post:metadata_list')
+  
+
+@staff_member_required
+@require_POST
 def blog_create(request, pk: int):
   metadata = Metadata.objects.select_related('keyword').get(pk=pk)
 

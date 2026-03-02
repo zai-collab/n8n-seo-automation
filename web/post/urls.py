@@ -6,6 +6,7 @@ app_name = 'post'
 
 urlpatterns = [
   path('metadata/', views.metadata_list, name='metadata_list'),
+  path('metadata/approve/', views.metadata_approve, name='metadata_approve'),
 
   path('blogs/', views.blog_list, name='blog_list'),
   path('blogs/<int:pk>/create/', views.blog_create, name='blog_create'),

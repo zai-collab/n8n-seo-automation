@@ -1,21 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Metadata{% endblock %}
+{% block title %}SERP Metadata{% endblock %}
 
 {% block content %}
 <div class="card">
-  <div class="section-title">Metadata</div>
+  <div class="section-title">SERPMetadata</div>
   <div class="row" style="margin-bottom:14px; justify-content:space-between;">
     <div class="row">
       <form method="get" class="row">
-        <input type="text" name="query" value="{{ query }}" placeholder="Search by title or description or intent">
+        <input type="text" name="query" value="{{ query }}" placeholder="Search SERP Metadata">
         <button class="btn secondary" type="submit">Search</button>
       </form>
     </div>
+
+    <form
+      method="post"
+      action="{% url 'post:metadata_approve' %}"
+      id="approve-form"
+      style="display: inline"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="selected_metadata" id="selected-metadata" />
+      <button class="btn" type="submit">Approve Metadata</button>
+    </form>
   </div>
 
   <table>
     <thead>
       <tr>
+        <th><input type="checkbox" id="select-all" title="Select all" /></th>
         <th>Title</th>
         <th>Description</th>
         <th>Intent</th>
@@ -25,17 +37,20 @@
       </tr>
     </thead>
     <tbody>
-      {% for metadata in page.object_list %}
+      {% for item in page.object_list %}
       <tr>
-        <td>{{ metadata.title }}</td>
-        <td>{{ metadata.meta_description }}</td>
-        <td>{{ metadata.intent }}</td>
-        <td>{{ metadata.keyword.keyword }}</td>
-        <td class="muted">{{ metadata.created_at }}</td>
+        <td>
+          <input type="checkbox" class="checkbox" value="{{ item.id }}" />
+        </td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.meta_description }}</td>
+        <td>{{ item.intent }}</td>
+        <td>{{ item.keyword.keyword }}</td>
+        <td class="muted">{{ item.created_at }}</td>
         <td style="text-align:right;">
-          <form method="post" action="{% url 'post:blog_create' metadata.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
+          <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
             {% csrf_token %}
-            <button class="btn primary" type="submit">Blog Create</button>
+            <button class="btn primary" type="submit" {% if not item.is_approved %}disabled{% endif %}>Blog Create</button>
           </form>
         </td>
       </tr>
@@ -48,7 +63,7 @@
   </table>
   <div class="row" style="justify-content:flex-end; margin-top:12px;">
     {% if page.has_previous %}
-      <a class="btn secondary" href="?page={{ page.prev_page }}&query={{ query|urlencode }}">Prev</a>
+      <a class="btn secondary" href="?page={{ page.previous_page_number }}&query={{ query|urlencode }}">Prev</a>
     {% endif %}
   
     <span class="muted" style="margin:0 10px;">
@@ -56,8 +71,33 @@
     </span>
   
     {% if page.has_next %}
-      <a class="btn secondary" href="?page={{ page.next_page }}&query={{ query|urlencode }}">Next</a>
+      <a class="btn secondary" href="?page={{ page.next_page_number }}&query={{ query|urlencode }}">Next</a>
     {% endif %}
   </div>
 </div>
+
+<script>
+  (function () {
+    const form = document.getElementById("approve-form");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      const checkboxes = document.querySelectorAll(".checkbox:checked");
+      const selectedIds = Array.from(checkboxes).map((item) => item.value);
+      document.getElementById("selected-metadata").value = selectedIds.join(",");
+      if (selectedIds.length === 0) {
+        alert("Please select at least one metadata to approve.");
+        e.preventDefault();
+      }
+    });
+
+    var element = document.getElementById("select-all");
+    if (element) {
+      element.addEventListener("change", function () {
+        document.querySelectorAll(".checkbox").forEach(function (cb) {
+          cb.checked = element.checked;
+        });
+      });
+    }
+  })();
+</script>
 {% endblock %}
