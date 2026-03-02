@@ -35,7 +35,7 @@ a:hover {
 }
 
 .wrap {
-  max-width: 1300px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 22px;
 }
@@ -87,6 +87,11 @@ a:hover {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 16px;
+}
+
+.card input[type="text"],
+.card input[type="number"] {
+  width: 300px;
 }
 
 .grid {

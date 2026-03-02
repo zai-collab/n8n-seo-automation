@@ -4,25 +4,19 @@
 {% block content %}
 <div class="grid">
   <div class="card">
-    <div class="label">Clusters</div>
-    <div class="value">{{ cluster_count }}</div>
-    <a class="btn" href="{% url 'kw:cluster_list' %}">Manage clusters</a>
-  </div>
-
-  <div class="card">
     <div class="label">Keywords</div>
     <div class="value">{{ keyword_count }}</div>
     <a class="btn" href="{% url 'kw:keyword_list' %}">Manage keywords</a>
   </div>
 
   <div class="card">
-    <div class="label">Metadata</div>
+    <div class="label">SERP Metadata</div>
     <div class="value">{{ metadata_count }}</div>
     <a class="btn" href="{% url 'post:metadata_list' %}">Manage metadata</a>
   </div>
 
   <div class="card">
-    <div class="label">Blog posts</div>
+    <div class="label">Blogs</div>
     <div class="value">{{ blog_count }}</div>
     <a class="btn" href="{% url 'post:blog_list' %}">Manage blogs</a>
   </div>
@@ -31,8 +25,8 @@
 <div class="card quick-actions">
   <div class="section-title">Quick actions</div>
   <div class="row">
-    <a class="chip" href="{% url 'kw:cluster_create' %}">+ Create cluster</a>
-    <a class="chip" href="{% url 'kw:keyword_create' %}">+ Add keyword</a>
+    <a class="chip" href="">+ Create cluster</a>
+    <a class="chip" href="">+ Add keyword</a>
     <a class="chip" href="/admin/">Admin</a>
   </div>
 </div>

@@ -1,0 +1,116 @@
+{% extends "base.html" %} {% block title %}Keywords{% endblock %} 
+{% block content %}
+<div class="card">
+  <div class="section-title">Keywords</div>
+
+  <div class="row" style="margin-bottom: 14px; justify-content: space-between">
+    <form method="get" class="row" style="gap: 8px">
+      <input
+        type="text"
+        name="query"
+        value="{{ query }}"
+        placeholder="Search keyword"
+      />
+      <button class="btn secondary" type="submit">Search</button>
+    </form>
+
+    <form
+      method="post"
+      action="{% url 'kw:keyword_approve' %}"
+      id="approve-form"
+      style="display: inline"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="selected_keywords" id="selected-keywords" />
+      <button class="btn" type="submit">Approve Keywords</button>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="select-all" title="Select all" /></th>
+        <th>Seed Keyword</th>
+        <th>Keyword</th>
+        <th>Volume</th>
+        <th>CPC</th>
+        <th>Competition</th>
+        <th>KD</th>
+        <th>Intent</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in page.object_list %}
+      <tr>
+        <td>
+          <input type="checkbox" class="checkbox" value="{{ item.id }}" />
+        </td>
+        <td>{{ item.seed_keyword }}</td>
+        <td>{{ item.keyword }}</td>
+        <td>{{ item.search_volume }}</td>
+        <td>{{ item.cpc }}</td>
+        <td>{{ item.competition }}</td>
+        <td>{{ item.keyword_difficulty }}</td>
+        <td>{{ item.search_intent }}</td>
+        <td>{{ item.created_at }}</td>
+        <td style="text-align: right">
+          <a class="btn secondary" href="{% url 'kw:keyword_edit' item.id %}"
+            >Edit</a
+          >
+          <form
+            method="post"
+            action="{% url 'kw:keyword_analyze' item.id %}"
+            style="display: inline"
+            onsubmit="return confirm('Analyze this keyword?');"
+          >
+            {% csrf_token %}
+            <button class="btn primary" type="submit" {% if not item.is_approved or item.is_analyzed %}disabled{% endif %}>Analyze</button>
+          </form>
+          <form
+            method="post"
+            action="{% url 'kw:keyword_delete' item.id %}"
+            style="display: inline"
+            onsubmit="return confirm('Delete this keyword?');"
+          >
+            {% csrf_token %}
+            <button class="btn danger" type="submit" {% if item.is_approved or item.is_analyzed %}disabled{% endif %}>Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="muted">Empty Data.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  (function () {
+    const form = document.getElementById("approve-form");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      const checkboxes = document.querySelectorAll(".checkbox:checked");
+      const selectedIds = Array.from(checkboxes).map((item) => item.value);
+      console.log(selectedIds);
+      document.getElementById("selected-keywords").value = selectedIds.join(",");
+      if (selectedIds.length === 0) {
+        alert("Please select at least one keyword to approve.");
+        e.preventDefault();
+      }
+    });
+
+    var element = document.getElementById("select-all");
+    if (element) {
+      element.addEventListener("change", function () {
+        document.querySelectorAll(".checkbox").forEach(function (cb) {
+          cb.checked = element.checked;
+        });
+      });
+    }
+  })();
+</script>
+{% endblock %}

@@ -1,45 +1,39 @@
 from django.db import models
 
 
-class Cluster(models.Model):
-  name = models.CharField(max_length=255, db_index=True)
-  intent = models.CharField(max_length=32, db_index=True)
-  seed_keyword = models.CharField(max_length=255, db_index=True)
-
-  created_at = models.DateTimeField(auto_now_add=True)
-
-  class Meta:
-    db_table = 'clusters'
-
-  def __str__(self):
-    return self.name
-
-
 class Keyword(models.Model):
-  cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE, related_name="keywords")
-
+  seed_keyword = models.CharField(max_length=255, db_index=True)
   keyword = models.CharField(max_length=255, db_index=True)
-  search_volume = models.IntegerField()
-  cpc = models.FloatField()
-  competition = models.CharField(max_length=16, db_index=True)
+  search_volume = models.IntegerField(db_index=True)
+  cpc = models.FloatField(max_length=16, db_index=True)
+  competition = models.FloatField(max_length=16, db_index=True)
+  keyword_difficulty = models.FloatField(max_length=16, db_index=True)
+  search_intent = models.CharField(max_length=32, db_index=True)
 
+  is_approved = models.BooleanField(default=False)
   is_analyzed = models.BooleanField(default=False)
 
   created_at = models.DateTimeField(auto_now_add=True)
 
+
   class Meta:
     db_table = 'keywords'
+
 
   def __str__(self):
     return self.keyword
 
+
   def serialize(self):
     return {
       "id": self.id,
+      "seed_keyword": self.seed_keyword,
       "keyword": self.keyword,
       "search_volume": self.search_volume,
       "cpc": self.cpc,
       "competition": self.competition,
+      "keyword_difficulty": self.keyword_difficulty,
+      "search_intent": self.search_intent,
       "is_analyzed": self.is_analyzed,
       "created_at": self.created_at.isoformat(),
     }
