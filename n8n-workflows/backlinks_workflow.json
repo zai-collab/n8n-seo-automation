@@ -1,0 +1,699 @@
+{
+  "name": "Backlinks",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "45d459a1-846c-4ae2-9a2d-eaf90e32fda8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8ea56b0e-16db-474d-b753-b1b0e68b961e",
+      "name": "Webhook",
+      "webhookId": "45d459a1-846c-4ae2-9a2d-eaf90e32fda8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9c87ac2-29a1-4580-8f74-4738420d58b1",
+              "name": "keyword",
+              "value": "={{ $json.body.data.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "11b8af36-f5fe-4e42-b6f2-f05a173cfe50",
+              "name": "locationName",
+              "value": "United States",
+              "type": "string"
+            },
+            {
+              "id": "1093a95e-6ea4-4e83-8a9d-363b918ed5c8",
+              "name": "languageName",
+              "value": "English",
+              "type": "string"
+            },
+            {
+              "id": "10d8c54c-13b0-40cf-95ce-eceff9eb2338",
+              "name": "depth",
+              "value": "=10",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d077cb86-353c-4022-ad28-aad6e53192b8",
+      "name": "Set SERP Params"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/serp/google/organic/live/regular",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"keyword\": \"{{ $json.keyword }}\",\n  \"location_name\": \"{{ $json.locationName }}\",\n  \"language_name\": \"{{ $json.languageName }}\",\n  \"depth\": {{ $json.depth }},\n}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4af61c7c-12b1-40a6-b6bb-da40dbb2dc27",
+      "name": "Getting Top Competitors",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "00d1df7e-00e0-4051-9967-81ebb986fa07",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7439806b-77e8-47df-bf03-e73e520b6ba0",
+              "leftValue": "={{ $json.rank_absolute }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            },
+            {
+              "id": "3c030228-c7d0-4738-8503-de1753ad3bf7",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "organic",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        272
+      ],
+      "id": "1f71bc5c-5bdc-4bab-a94c-35b1af4c7e30",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bad81f6b-336a-44dc-b43d-3f07480c77cb",
+              "name": "keyword",
+              "value": "={{ $(\"Set SERP Params\").first().json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "068e116e-f021-40c1-8b4e-fe31ec77fb59",
+              "name": "=domain",
+              "value": "={{ $json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "b63e2669-fa9d-430b-8bbe-85d2d0d9ebcf",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "e6f2b031-7d2e-4809-8020-df72d1c6975a",
+              "name": "rank",
+              "value": "={{ $json.rank_absolute }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        272
+      ],
+      "id": "d08576b4-b317-400f-83b2-f1ee129e9cbe",
+      "name": "Set SERP Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/backlinks/backlinks/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"target\": \"{{ $json.url }}\",\n  \"mode\": \"as_is\",\n  \"filters\": [\"dofollow\", \"=\", true],\n  \"limit\": 10\n}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        272
+      ],
+      "id": "ba7dffc4-df62-47ba-a044-ba639fd92ba7",
+      "name": "Backlinks Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        },
+        "httpBasicAuth": {
+          "id": "4UFJhFhvARKFsbUZ",
+          "name": "DataForSEO Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        272
+      ],
+      "id": "c91d3ad0-cdf3-45c9-8890-cd1a026f326b",
+      "name": "Split Out Backlinks Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "40104c66-399d-44f4-8eb4-b878fd26fe37",
+              "name": "domainFrom",
+              "value": "={{ $json.domain_from }}",
+              "type": "string"
+            },
+            {
+              "id": "76f4955e-e0ed-4e30-9130-a298051f7574",
+              "name": "urlFrom",
+              "value": "={{ $json.url_from }}",
+              "type": "string"
+            },
+            {
+              "id": "df5d3364-8a96-489d-8b1e-2a46a8b1e962",
+              "name": "anchor",
+              "value": "={{ $json.anchor }}",
+              "type": "string"
+            },
+            {
+              "id": "784db88a-2e73-4ca8-865e-3271cb22a38a",
+              "name": "semanticLocation",
+              "value": "={{ $json.semantic_location }}",
+              "type": "string"
+            },
+            {
+              "id": "37f9061c-eb97-4ef5-9691-81be9f412f36",
+              "name": "=linksCount",
+              "value": "={{ $json.links_count }}",
+              "type": "number"
+            },
+            {
+              "id": "251fa30a-0335-4fe6-b2c3-10b66d15c629",
+              "name": "firstSeen",
+              "value": "={{ $json.first_seen }}",
+              "type": "string"
+            },
+            {
+              "id": "0773f5f2-c15c-49eb-898a-e640fc60009c",
+              "name": "domainRank",
+              "value": "={{ $json.domain_from_rank }}",
+              "type": "number"
+            },
+            {
+              "id": "3a7428ad-60f3-4ade-a45c-c0533395ab2f",
+              "name": "dofollow",
+              "value": "={{ $json.dofollow }}",
+              "type": "boolean"
+            },
+            {
+              "id": "aa2ec325-aaeb-4619-9cea-2c9a72b198a4",
+              "name": "backlinkSpamScore",
+              "value": "={{ $json.backlink_spam_score }}",
+              "type": "number"
+            },
+            {
+              "id": "30a4c6c4-2138-4901-aa77-ede73eba5dd7",
+              "name": "lastSeen",
+              "value": "={{ $json.last_seen }}",
+              "type": "string"
+            },
+            {
+              "id": "48e59d9e-5580-4946-8b0e-664446ef16d8",
+              "name": "urlTo",
+              "value": "={{ $json.url_to }}",
+              "type": "string"
+            },
+            {
+              "id": "9e7d7331-7a1b-45d4-b90e-350feb925975",
+              "name": "is_broken",
+              "value": "={{ $json.is_broken }}",
+              "type": "boolean"
+            },
+            {
+              "id": "de030310-e49f-420b-a215-23c1bbb53209",
+              "name": "alt",
+              "value": "={{ $json.alt }}",
+              "type": "string"
+            },
+            {
+              "id": "8ba92dea-7a3f-471b-815b-4ab7989caf45",
+              "name": "itemType",
+              "value": "={{ $json.item_type }}",
+              "type": "string"
+            },
+            {
+              "id": "3718b81f-dd5d-4d2b-90ed-51574a775c3d",
+              "name": "isIndirectLink",
+              "value": "={{ $json.is_indirect_link }}",
+              "type": "boolean"
+            },
+            {
+              "id": "d17bedbb-f16e-46d1-8d03-4cc97603a83d",
+              "name": "urlToRedirectTarget",
+              "value": "={{ $json.url_to_redirect_target }}",
+              "type": "string"
+            },
+            {
+              "id": "bd12b4ff-7410-4dc7-8510-8da921761f80",
+              "name": "isNew",
+              "value": "={{ $json.is_new }}",
+              "type": "boolean"
+            },
+            {
+              "id": "24f8d4fb-836c-43f6-92d6-e336bbb926ac",
+              "name": "isLost",
+              "value": "={{ $json.is_lost }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        112
+      ],
+      "id": "0d173746-b582-4a3a-b922-45060656a577",
+      "name": "Set Backlinks Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cbd98eb1-7d09-4477-9436-a455fd6d2ac5",
+              "leftValue": "={{ $json.domainRank }}",
+              "rightValue": 500,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "8b1774f6-6b52-4d2b-b73e-408c462d4b25",
+              "leftValue": "={{ $json.linksCount }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "87ebf9ed-020f-42db-a07f-9c2286ae9635",
+              "leftValue": "={{ $json.dofollow }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5042927c-4cd2-49de-a458-5ef8b756a4f9",
+              "leftValue": "={{ $json.backlinkSpamScore }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        112
+      ],
+      "id": "b63bd42c-1a22-4cd5-a3dd-085afcb6ee43",
+      "name": "Spam Quality Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3ed3da3d-df79-4fb3-90d7-4c9d4681e390",
+              "leftValue": "={{ $json.anchor }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d61cd38b-42c0-4cd4-a16f-493853d00fe3",
+              "leftValue": "={{ $json.alt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        112
+      ],
+      "id": "3269af9c-1393-4e3b-b8c2-16f411b2aafc",
+      "name": "Anchor Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Top Competitors",
+        "height": 224,
+        "width": 832,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "ec1c82bc-fc1a-487d-bb8e-b0af8d7e1e96",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Backlinks",
+        "height": 224,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "0f4f31d7-9014-42bd-bdf6-0cfb1c39a022",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Result Output",
+        "height": 224,
+        "width": 980,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "fa0d8c57-7bba-4a9d-9960-d59b114552c7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://web:8000/api/v1/backlinks-webhook/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "backlinks",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1664,
+        112
+      ],
+      "id": "08c51c50-00f0-4da3-ab0e-d85f16199b3a",
+      "name": "Upload To Django",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        112
+      ],
+      "id": "918b56c8-219c-4f34-9251-39f99e5b01f6",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set SERP Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set SERP Params": {
+      "main": [
+        [
+          {
+            "node": "Getting Top Competitors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Getting Top Competitors": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Set SERP Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set SERP Data": {
+      "main": [
+        [
+          {
+            "node": "Backlinks Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backlinks Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out Backlinks Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Backlinks Data": {
+      "main": [
+        [
+          {
+            "node": "Set Backlinks Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Backlinks Data": {
+      "main": [
+        [
+          {
+            "node": "Spam Quality Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spam Quality Filter": {
+      "main": [
+        [
+          {
+            "node": "Anchor Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anchor Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Upload To Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dc3c3d8d-3d99-42b0-8028-f2421099d8fc",
+  "meta": {
+    "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
+  },
+  "id": "mZQXogbJW4NwbJQn",
+  "tags": []
+}
