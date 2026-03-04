@@ -16,6 +16,7 @@
         <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
         <a href="/posts/metadata/" class="{% if request.path|slice:':15' == '/posts/metadata' %}active{% endif %}">Metadata</a>
         <a href="/posts/blogs/" class="{% if request.path|slice:':12' == '/posts/blogs' %}active{% endif %}">Blogs</a>
+        <a href="/backlinks/" class="{% if request.path|slice:':10' == '/backlinks' %}active{% endif %}">Backlinks</a>
         <a href="/admin/">Admin</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}

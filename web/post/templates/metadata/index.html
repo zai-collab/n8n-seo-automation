@@ -46,7 +46,7 @@
         <td>{{ item.meta_description }}</td>
         <td>{{ item.intent }}</td>
         <td>{{ item.keyword.keyword }}</td>
-        <td class="muted">{{ item.created_at }}</td>
+        <td class="muted">{{ item.created_at|date:"Y-m-d H:i" }}</td>
         <td style="text-align:right;">
           <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
             {% csrf_token %}

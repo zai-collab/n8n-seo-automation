@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('kw/', include('kw.urls')),
     path('posts/', include('post.urls')),
+    path('backlinks/', include('backlink.urls')),
     path('api/v1/', include('api.urls')),
     path('logout/', views.logout, name="logout"),
 ] 

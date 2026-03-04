@@ -20,6 +20,12 @@
     <div class="value">{{ blog_count }}</div>
     <a class="btn" href="{% url 'post:blog_list' %}">Manage blogs</a>
   </div>
+
+  <div class="card">
+    <div class="label">Backlinks</div>
+    <div class="value">{{ backlink_count }}</div>
+    <a class="btn" href="{% url 'backlink:backlink_list' %}">Manage backlinks</a>
+  </div>
 </div>
 
 <div class="card quick-actions">

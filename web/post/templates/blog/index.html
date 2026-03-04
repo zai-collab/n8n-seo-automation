@@ -31,7 +31,7 @@
         <td>{{ blog.slug }}</td>
         <td>{{ blog.content|safe|truncatechars:200 }}</td>
         <td><img src="{{ MEDIA_URL }}{{ blog.featured_image_path }}" alt="{{ blog.featured_image_alt }}" class="featured-image" /></td>
-        <td class="muted">{{ blog.created_at }}</td>
+        <td class="muted">{{ blog.created_at|date:"Y-m-d H:i" }}</td>
         <td style="text-align:right;">
           <form method="post" action="{% url 'post:blog_delete' blog.id %}" style="display:inline" onsubmit="return confirm('Delete blog?');">
             {% csrf_token %}

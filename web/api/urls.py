@@ -11,4 +11,5 @@ urlpatterns = [
     path("keyword-analyze-cron-job-webhook/", views.keyword_analyze_cron_job_webhook),
     path("image-upload-webhook/", views.image_upload_webhook),
     path("blog-post-webhook/", views.blog_post_webhook),
+    path("backlinks-webhook/", views.backlinks_webhook),
 ]

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'rest_framework',
     'api',
+    'backlink',
     'post',
     'kw',
 ]

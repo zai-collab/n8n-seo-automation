@@ -54,7 +54,7 @@
         <td>{{ item.competition }}</td>
         <td>{{ item.keyword_difficulty }}</td>
         <td>{{ item.search_intent }}</td>
-        <td>{{ item.created_at }}</td>
+        <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
         <td style="text-align: right">
           <a class="btn secondary" href="{% url 'kw:keyword_edit' item.id %}"
             >Edit</a

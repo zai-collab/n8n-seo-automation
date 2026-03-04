@@ -1,6 +1,5 @@
 import json
 import random
-from tarfile import data_filter
 import time
 
 from django.core.files.storage import default_storage
@@ -9,6 +8,7 @@ from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from backlink.models import Backlink
 from post.models import Metadata, Blog
 from kw.models import Keyword
 
@@ -126,5 +126,43 @@ def image_upload_webhook(request):
 
   blog.featured_image_path = path
   blog.save()
+
+  return HttpResponse("success")
+
+
+@csrf_exempt
+@require_POST
+def backlinks_webhook(request):
+  try:
+    data = json.loads(request.body)
+  except json.JSONDecodeError:
+    return HttpResponseBadRequest("Invalid Request Body")
+
+  backlinks = data.get("backlinks")
+
+  if not backlinks:
+    return HttpResponseBadRequest("Missing Required Fields")
+
+  for backlink in backlinks:
+    Backlink.objects.create(
+      domain_from=backlink.get("domainFrom", ""),
+      domain_rank=backlink.get("domainRank") or 0,
+      url_from=backlink.get("urlFrom", ""),
+      url_to=backlink.get("urlTo", ""),
+      url_to_redirect_target=backlink.get("urlToRedirectTarget", ""),
+      links_count=backlink.get("linksCount") or 0,
+      semantic_location=backlink.get("semanticLocation", ""),
+      anchor_text=backlink.get("anchor", ""),
+      alt_text=backlink.get("alt", ""),
+      backlink_spam_score=backlink.get("backlinkSpamScore") or 0,
+      item_type=backlink.get("itemType", ""),
+      is_indirect_link=backlink.get("isIndirectLink") or False,
+      dofollow=backlink.get("dofollow") or False,
+      is_broken=backlink.get("isBroken") or False,
+      is_lost=backlink.get("isLost") or False,
+      is_new=backlink.get("isNew") or False,
+      first_seen=backlink.get("firstSeen"),
+      last_seen=backlink.get("lastSeen"),
+    )
 
   return HttpResponse("success")
