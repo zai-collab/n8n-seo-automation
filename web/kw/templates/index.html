@@ -70,6 +70,15 @@
           </form>
           <form
             method="post"
+            action="{% url 'kw:keyword_backlinks' item.id %}"
+            style="display: inline"
+            onsubmit="return confirm('Collect backlinks for this keyword?');"
+          >
+            {% csrf_token %}
+            <button class="btn primary" type="submit" {% if not item.is_approved or not item.is_analyzed %}disabled{% endif %}>Backlinks</button>
+          </form>
+          <form
+            method="post"
             action="{% url 'kw:keyword_delete' item.id %}"
             style="display: inline"
             onsubmit="return confirm('Delete this keyword?');"

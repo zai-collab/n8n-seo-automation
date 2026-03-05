@@ -9,6 +9,7 @@ class Backlink(models.Model):
   url_to_redirect_target = models.URLField(blank=True, null=True)
   links_count = models.IntegerField()
   semantic_location = models.CharField(max_length=32, blank=True, null=True)
+  page_title = models.CharField(max_length=255, blank=True, null=True)
   anchor_text = models.CharField(max_length=255, blank=True, null=True)
   alt_text = models.CharField(max_length=255, blank=True, null=True)
   backlink_spam_score = models.FloatField()

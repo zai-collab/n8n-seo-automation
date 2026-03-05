@@ -23,6 +23,7 @@
         <th>Domain From</th>
         <th>Rank</th>
         <th>URL To</th>
+        <th>Page Title</th>
         <th>Anchor</th>
         <th>Spam Score</th>
         <th>First Seen</th>
@@ -35,6 +36,7 @@
         <td>{{ item.domain_from|default:"-" }}</td>
         <td>{{ item.domain_rank }}</td>
         <td>{{ item.url_to|truncatechars:40|default:"-" }}</td>
+        <td>{{ item.page_title|default:"-" }}</td>
         <td>{{ item.anchor_text|default:"-" }}</td>
         <td>{{ item.backlink_spam_score }}</td>
         <td>{{ item.first_seen|date:"Y-m-d"|default:"-" }}</td>

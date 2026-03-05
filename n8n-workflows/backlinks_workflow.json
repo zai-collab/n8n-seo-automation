@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "path": "45d459a1-846c-4ae2-9a2d-eaf90e32fda8",
+        "path": "keyword-backlinks",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -42,6 +42,12 @@
               "id": "10d8c54c-13b0-40cf-95ce-eceff9eb2338",
               "name": "depth",
               "value": "=10",
+              "type": "number"
+            },
+            {
+              "id": "ed05e996-91c4-403b-bb6e-aa7ec2e5c1fe",
+              "name": "id",
+              "value": "={{ $json.body.data.id }}",
               "type": "number"
             }
           ]
@@ -336,6 +342,12 @@
               "name": "isLost",
               "value": "={{ $json.is_lost }}",
               "type": "boolean"
+            },
+            {
+              "id": "9f969c68-db2f-421f-b26c-506e36b047e5",
+              "name": "pageTitle",
+              "value": "={{ $json.page_from_title }}",
+              "type": "string"
             }
           ]
         },
@@ -690,7 +702,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "dc3c3d8d-3d99-42b0-8028-f2421099d8fc",
+  "versionId": "e12ca7d9-ebeb-4758-b8a6-0d19392324c6",
   "meta": {
     "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
   },

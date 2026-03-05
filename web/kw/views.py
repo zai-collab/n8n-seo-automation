@@ -110,3 +110,19 @@ def keyword_analyze(request, pk: int):
   )
 
   return redirect("kw:keyword_list")
+
+
+@staff_member_required
+@require_POST
+def keyword_backlinks(request, pk: int):
+  keyword = get_object_or_404(Keyword, pk=pk)
+  if not keyword:
+    return redirect('/')
+
+  requests.post(
+    urljoin(os.getenv('N8N_BASE_URL'), os.getenv('N8N_KEYWORD_BACKLINKS_WEBHOOK_URL')),
+    headers={"Webhook-Token": settings.WEBHOOK_TOKEN},
+    json={"data": keyword.serialize()},
+    timeout=15
+  )
+  

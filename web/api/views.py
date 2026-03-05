@@ -152,6 +152,7 @@ def backlinks_webhook(request):
       url_to_redirect_target=backlink.get("urlToRedirectTarget", ""),
       links_count=backlink.get("linksCount") or 0,
       semantic_location=backlink.get("semanticLocation", ""),
+      page_title=backlink.get("pageTitle", ""),
       anchor_text=backlink.get("anchor", ""),
       alt_text=backlink.get("alt", ""),
       backlink_spam_score=backlink.get("backlinkSpamScore") or 0,
