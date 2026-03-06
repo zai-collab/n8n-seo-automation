@@ -26,6 +26,7 @@
           <th><input type="checkbox" id="select-all" title="Select all" /></th>
           <th>Seed Keyword</th>
           <th>Keyword</th>
+          <th>Status</th>
           <th>Volume</th>
           <th>CPC</th>
           <th>Competition</th>
@@ -41,6 +42,7 @@
           <td><input type="checkbox" class="checkbox" value="{{ item.id }}" /></td>
           <td>{{ item.seed_keyword }}</td>
           <td>{{ item.keyword }}</td>
+          <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
           <td>{{ item.search_volume }}</td>
           <td>{{ item.cpc }}</td>
           <td>{{ item.competition }}</td>
@@ -52,15 +54,15 @@
               <a class="btn secondary btn-sm" href="{% url 'kw:keyword_edit' item.id %}">Edit</a>
               <form method="post" action="{% url 'kw:keyword_analyze' item.id %}" style="display:inline" onsubmit="return confirm('Analyze this keyword?');">
                 {% csrf_token %}
-                <button class="btn primary btn-sm" type="submit" {% if not item.is_approved or item.is_analyzed %}disabled{% endif %}>Analyze</button>
+                <button class="btn primary btn-sm" type="submit" {% if item.status != 'approved' %}disabled{% endif %}>Analyze</button>
               </form>
               <form method="post" action="{% url 'kw:keyword_backlinks' item.id %}" style="display:inline" onsubmit="return confirm('Collect backlinks for this keyword?');">
                 {% csrf_token %}
-                <button class="btn primary btn-sm" type="submit" {% if not item.is_approved or not item.is_analyzed %}disabled{% endif %}>Backlinks</button>
+                <button class="btn primary btn-sm" type="submit" {% if item.status != 'analyzed' %}disabled{% endif %}>Backlinks</button>
               </form>
               <form method="post" action="{% url 'kw:keyword_delete' item.id %}" style="display:inline" onsubmit="return confirm('Delete this keyword?');">
                 {% csrf_token %}
-                <button class="btn danger btn-sm" type="submit" {% if item.is_approved or item.is_analyzed %}disabled{% endif %}>Delete</button>
+                <button class="btn danger btn-sm" type="submit" {% if item.status != 'pending' %}disabled{% endif %}>Delete</button>
               </form>
             </div>
           </td>

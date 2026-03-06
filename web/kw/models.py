@@ -10,8 +10,16 @@ class Keyword(models.Model):
   keyword_difficulty = models.FloatField(max_length=16, db_index=True)
   search_intent = models.CharField(max_length=32, db_index=True)
 
-  is_approved = models.BooleanField(default=False)
-  is_analyzed = models.BooleanField(default=False)
+  status = models.CharField(
+    max_length=32,
+    choices=[
+      ('pending', 'Pending'),
+      ('approved', 'Approved'),
+      ('analyzed', 'Analyzed'),
+      ('rejected', 'Rejected'),
+    ],
+    default='pending',
+  )
 
   created_at = models.DateTimeField(auto_now_add=True)
 

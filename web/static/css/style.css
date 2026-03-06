@@ -370,17 +370,20 @@ select {
   letter-spacing: 0.02em;
 }
 
+.status-pending,
 .status-draft {
   background: rgba(255, 255, 255, 0.08);
   color: var(--muted);
 }
 
+.status-analyzed,
 .status-submitted,
 .status-sent {
   background: var(--accent-muted);
   color: var(--accent);
 }
 
+.status-approved,
 .status-published,
 .status-accepted {
   background: var(--ok-muted);
