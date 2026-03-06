@@ -13,4 +13,5 @@ urlpatterns = [
     path("blog-post-webhook/", views.blog_post_webhook),
     path("backlinks-webhook/", views.backlinks_webhook),
     path("content-webhook/", views.content_webhook),
+    path("outreach-webhook/", views.outreach_webhook),
 ]

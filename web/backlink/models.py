@@ -112,3 +112,29 @@ class Content(models.Model):
       'created_at': self.created_at.isoformat(),
     }
     
+
+class Outreach(models.Model):
+  content = models.OneToOneField(Content, on_delete=models.CASCADE, related_name='outreach')
+
+  subject = models.CharField(max_length=255, blank=True, null=True)
+  body = models.TextField(blank=True, null=True)
+  status = models.CharField(
+    max_length=32,
+    choices=[
+      ('draft', 'Draft'),
+      ('sent', 'Sent'),
+      ('accepted', 'Accepted'),
+      ('rejected', 'Rejected'),
+    ],
+    default='draft',
+  )
+
+  created_at = models.DateTimeField(auto_now_add=True)
+
+
+  class Meta:
+    db_table = 'outreachs'
+
+  def __str__(self):
+    return self.subject
+    

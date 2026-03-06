@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Backlink, Content
+from .models import Backlink, Content, Outreach
 
 
 @admin.register(Backlink)
@@ -16,3 +16,9 @@ class ContentAdmin(admin.ModelAdmin):
   search_fields = ('title', 'topics', 'anchor_text', 'target_url', 'author',)
   list_filter = ('created_at',)
   
+
+@admin.register(Outreach)
+class OutreachAdmin(admin.ModelAdmin):
+  list_display = ('subject', 'body', 'status', 'created_at')
+  search_fields = ('subject', 'body',)
+  list_filter = ('created_at',)

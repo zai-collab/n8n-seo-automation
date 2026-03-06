@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Backlink, Content
+from .models import Backlink, Content, Outreach
 
 
 @staff_member_required
@@ -112,7 +112,52 @@ def content_guest_post(request, pk: int):
 
 @staff_member_required
 def content_outreach(request, pk: int):
-  pass
+  content = get_object_or_404(Content, pk=pk)
+  
+  requests.post(
+    urljoin(os.getenv('N8N_BASE_URL'), os.getenv('N8N_OUTREACH_WEBHOOK_URL')),
+    headers={"Webhook-Token": settings.WEBHOOK_TOKEN},
+    json={"content": content.serialize()},
+    timeout=15
+  )
+
+  return redirect('backlink:content_list')
+
+
+@staff_member_required
+def outreach_list(request):
+  query = request.GET.get('query', '').strip()
+  status = request.GET.get('status', '').strip()
+
+  qs = Outreach.objects.select_related('content', 'content__backlink').order_by('-created_at')
+
+  if query:
+    qs = qs.filter(
+      Q(subject__icontains=query)
+      | Q(body__icontains=query)
+      | Q(content__title__icontains=query)
+      | Q(content__backlink__domain_from__icontains=query)
+    )
+
+  if status:
+    qs = qs.filter(status=status)
+
+  paginator = Paginator(qs, 10)
+  page = paginator.get_page(request.GET.get('page'))
+
+  context = {
+    'page': page,
+    'query': query,
+    'status': status,
+  }
+  return render(request, 'outreach/index.html', context)
+
+
+@staff_member_required
+def outreach_delete(request, pk: int):
+  outreach = get_object_or_404(Outreach, pk=pk)
+  outreach.delete()
+  return redirect('backlink:outreach_list')
 
 
 @staff_member_required

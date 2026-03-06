@@ -16,8 +16,9 @@
         <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
         <a href="/posts/metadata/" class="{% if request.path|slice:':15' == '/posts/metadata' %}active{% endif %}">Metadata</a>
         <a href="/posts/blogs/" class="{% if request.path|slice:':12' == '/posts/blogs' %}active{% endif %}">Blogs</a>
-        <a href="/backlinks/" class="{% if request.path|slice:':10' == '/backlinks' and request.path|slice:':18' != '/backlinks/content' %}active{% endif %}">Backlinks</a>
+        <a href="/backlinks/" class="{% if request.path|slice:':10' == '/backlinks' and request.path|slice:':18' != '/backlinks/content' and request.path|slice:':19' != '/backlinks/outreach' %}active{% endif %}">Backlinks</a>
         <a href="/backlinks/content/" class="{% if request.path|slice:':18' == '/backlinks/content' %}active{% endif %}">Content</a>
+        <a href="/backlinks/outreach/" class="{% if request.path|slice:':19' == '/backlinks/outreach' %}active{% endif %}">Outreach</a>
         <a href="/admin/">Admin</a>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}

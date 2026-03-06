@@ -1,0 +1,268 @@
+{
+  "name": "Outreach",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "outreach",
+        "authentication": "headerAuth",
+        "options": {
+          "responseData": "success"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -368,
+        0
+      ],
+      "id": "01e27654-9c1f-4298-8d7f-dfb4f28f7922",
+      "name": "Webhook",
+      "webhookId": "53e85027-2045-4e09-a540-03739e49dca8",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "8384a54d-3c11-4dd9-a704-fb190ae5faf8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2504806c-d628-45a5-96b7-34617173c026",
+              "name": "domainFrom",
+              "value": "={{ $json.backlink.domain_from }}",
+              "type": "string"
+            },
+            {
+              "id": "a65f8e69-c448-4558-8826-fac8f9544a66",
+              "name": "pageTitle",
+              "value": "={{ $json.backlink.page_title }}",
+              "type": "string"
+            },
+            {
+              "id": "5fca8d19-e14a-49fc-a6d7-4323ad3fe5d5",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "c117974d-3108-4729-8031-02966bdb5020",
+              "name": "author",
+              "value": "={{ $json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "717f67cc-c1c7-4b2f-bf8a-3e898d5c510a",
+              "name": "targetUrl",
+              "value": "={{ $json.target_url }}",
+              "type": "string"
+            },
+            {
+              "id": "c181b209-b9ec-425b-ad9d-7a7ffab57f28",
+              "name": "topics",
+              "value": "={{ $json.topics }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "99a59631-19e3-4fc0-a991-f5eaf87f795e",
+      "name": "Prepare for GPT"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an SEO outreach specialist who writes concise and natural guest post outreach emails.\n\nGuidelines:\n- Emails must be friendly, professional, and conversational.\n- Avoid spammy language.\n- Keep email length under 120 words.\n- Mention the target website article when possible.\n- Offer guest post topic ideas.\n\nOutput Rules:\n- Respond ONLY with valid JSON.\n- Do not include explanations.\n- Follow the exact JSON schema provided."
+            },
+            {
+              "content": "=Write a guest post outreach email.\n\nTarget Website:\n{{ $json.domainFrom }}\n\nExample Article On Website:\n{{ $json.pageTitle }}\n\nAuthor Name:\n{{ $json.author }}\n\nWebsite:\n{{ $json.targetUrl }}\n\nGuest Post Topics:\n1. {{ $json.topics[0] }}\n2. {{ $json.topics[1] }}\n3. {{ $json.topics[2] }}\n\nReturn JSON in this format (No markdown):\n\n{\n  \"subject\": \"String\",\n  \"body\": \"String\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "b88f7164-c731-493f-afa9-0c2ef35f40b2",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fde50078-9325-47d6-b1d5-d8d9f38ed8f2",
+              "name": "result",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        0
+      ],
+      "id": "33cb1103-8973-490f-b3fd-61e3996037e7",
+      "name": "Set GPT Result"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://web:8000/api/v1/outreach-webhook/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "subject",
+              "value": "={{ $json.result.subject }}"
+            },
+            {
+              "name": "body",
+              "value": "={{ $json.result.body }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $('Prepare for GPT').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        0
+      ],
+      "id": "5c4783fd-73a5-4b0a-a388-e4940fbecbdc",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Prepare for GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for GPT": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Set GPT Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set GPT Result": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "88641f06-b826-4f80-b16b-3047bb8dec88",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
+  },
+  "id": "sw8YEO5cq3dok6gQ",
+  "tags": []
+}

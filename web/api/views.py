@@ -8,7 +8,7 @@ from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from backlink.models import Backlink, Content
+from backlink.models import Backlink, Content, Outreach
 from post.models import Metadata, Blog
 from kw.models import Keyword
 
@@ -220,4 +220,20 @@ def content_webhook(request):
 @csrf_exempt
 @require_POST
 def outreach_webhook(request):
-  pass
+  try:
+    data = json.loads(request.body)
+  except json.JSONDecodeError:
+    return HttpResponseBadRequest("Invalid Request Body")
+
+  content_id = data.get("id")
+  content = Content.objects.get(pk=content_id)
+  if not content:
+    return HttpResponseBadRequest("Missing Required Fields")
+
+  Outreach.objects.create(
+    content=content,
+    subject=data.get("subject"),
+    body=data.get("body"),
+  )
+
+  return HttpResponse("success")

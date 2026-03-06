@@ -216,3 +216,27 @@ select {
   border-radius: 8px;
   display: block;
 }
+
+.status {
+  font-size: 0.85em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.status-draft {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+.status-submitted,
+.status-sent {
+  background: rgba(106, 166, 255, 0.2);
+  color: var(--accent);
+}
+.status-published,
+.status-accepted {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--ok);
+}
+.status-rejected {
+  background: rgba(255, 90, 106, 0.2);
+  color: var(--danger);
+}

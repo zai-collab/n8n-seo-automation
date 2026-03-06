@@ -162,7 +162,8 @@
         0
       ],
       "id": "c50d4e83-d2c5-4c3b-a9ab-66f549adc771",
-      "name": "Split Out"
+      "name": "Split Out",
+      "disabled": true
     },
     {
       "parameters": {
@@ -527,6 +528,69 @@
       ],
       "id": "095ded45-3320-48ee-9e21-8c695b649849",
       "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "content": "## Content Input",
+        "height": 224,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "77a114aa-b495-4514-b223-731df0d0bf57",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Content Topic",
+        "height": 224,
+        "width": 1088,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "cd38f806-d9ca-48d0-9fce-38a1f39125a8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Content Guest Post",
+        "height": 224,
+        "width": 1088,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "3869aee8-9e8e-4dd7-8195-ac526e4f2b9a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Result Output",
+        "height": 224,
+        "width": 368,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "cf32e7d5-de2c-4751-949f-130acc3ebf8e",
+      "name": "Sticky Note3"
     }
   ],
   "pinData": {},
@@ -699,7 +763,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "60607ca7-d678-48aa-bbae-028b261b055f",
+  "versionId": "f1b75aaa-66db-4a69-b79d-c006ed0de373",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
