@@ -12,7 +12,7 @@
       <input type="text" name="query" value="{{ query }}" placeholder="Search keyword" />
       <button class="btn secondary" type="submit">Search</button>
     </form>
-    <form method="post" action="{% url 'kw:keyword_approve' %}" id="approve-form">
+    <form method="post" action="{% url 'kw:keyword_approve' %}" id="approve-form" class="toolbar-end">
       {% csrf_token %}
       <input type="hidden" name="selected_keywords" id="selected-keywords" />
       <button class="btn primary" type="submit">Approve Keywords</button>

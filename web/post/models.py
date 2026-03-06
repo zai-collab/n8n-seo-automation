@@ -23,7 +23,15 @@ class Metadata(models.Model):
     blank=True,
   )
 
-  is_approved = models.BooleanField(default=False)
+  status = models.CharField(
+    max_length=32,
+    choices=[
+      ('draft', 'Draft'),
+      ('approved', 'Approved'),
+      ('rejected', 'Rejected'),
+    ],
+    default='draft',
+  )
 
   created_at = models.DateTimeField(auto_now_add=True)
 
@@ -42,7 +50,16 @@ class Blog(models.Model):
   featured_image_path = models.CharField(max_length=1024, blank=True, default="")
   featured_image_alt = models.TextField(blank=True, default="")
 
-  status = models.CharField(max_length=20, default="draft")
+  status = models.CharField(
+    max_length=32,
+    choices=[
+      ('draft', 'Draft'),
+      ('approved', 'Approved'),
+      ('published', 'Published'),
+      ('rejected', 'Rejected'),
+    ],
+    default='draft',
+  )
   
   created_at = models.DateTimeField(auto_now_add=True)
 

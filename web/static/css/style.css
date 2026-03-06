@@ -170,6 +170,10 @@ a:hover {
   margin-bottom: 20px;
 }
 
+.card-toolbar .toolbar-end {
+  margin-left: auto;
+}
+
 .card-toolbar .search-form,
 .card-toolbar .filters {
   display: flex;

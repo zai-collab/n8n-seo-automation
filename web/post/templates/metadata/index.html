@@ -12,7 +12,7 @@
       <input type="text" name="query" value="{{ query }}" placeholder="Search SERP Metadata" />
       <button class="btn secondary" type="submit">Search</button>
     </form>
-    <form method="post" action="{% url 'post:metadata_approve' %}" id="approve-form">
+    <form method="post" action="{% url 'post:metadata_approve' %}" id="approve-form" class="toolbar-end">
       {% csrf_token %}
       <input type="hidden" name="selected_metadata" id="selected-metadata" />
       <button class="btn primary" type="submit">Approve Metadata</button>
@@ -26,6 +26,7 @@
           <th><input type="checkbox" id="select-all" title="Select all" /></th>
           <th>Title</th>
           <th>Description</th>
+          <th>Status</th>
           <th>Intent</th>
           <th>Keyword</th>
           <th>Created</th>
@@ -38,6 +39,7 @@
           <td><input type="checkbox" class="checkbox" value="{{ item.id }}" /></td>
           <td>{{ item.title }}</td>
           <td>{{ item.meta_description }}</td>
+          <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
           <td>{{ item.intent }}</td>
           <td>{{ item.keyword.keyword }}</td>
           <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
@@ -45,7 +47,7 @@
             <div class="btn-group">
               <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
                 {% csrf_token %}
-                <button class="btn primary btn-sm" type="submit" {% if not item.is_approved %}disabled{% endif %}>Blog Create</button>
+                <button class="btn primary btn-sm" type="submit" {% if item.status != 'approved' %}disabled{% endif %}>Blog Create</button>
               </form>
             </div>
           </td>

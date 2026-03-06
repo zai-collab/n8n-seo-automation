@@ -21,6 +21,7 @@
           <th>Title</th>
           <th>Slug</th>
           <th>Content</th>
+          <th>Status</th>
           <th>Featured Image</th>
           <th>Created</th>
           <th></th>
@@ -31,7 +32,8 @@
         <tr>
           <td>{{ blog.title }}</td>
           <td>{{ blog.slug }}</td>
-          <td>{{ blog.content|safe|truncatechars:200 }}</td>
+          <td>{{ blog.content_html|safe|truncatechars:200 }}</td>
+          <td><span class="status status-{{ blog.status }}">{{ blog.get_status_display }}</span></td>
           <td><img src="{{ MEDIA_URL }}{{ blog.featured_image_path }}" alt="{{ blog.featured_image_alt }}" class="featured-image" /></td>
           <td>{{ blog.created_at|date:"Y-m-d H:i" }}</td>
           <td class="table-actions">
