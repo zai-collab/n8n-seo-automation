@@ -18,11 +18,12 @@
     <table>
       <thead>
         <tr>
-          <th>Domain From</th>
+          <th>Domain</th>
           <th>Rank</th>
           <th>URL To</th>
           <th>Page Title</th>
           <th>Anchor</th>
+          <th>Status</th>
           <th>Spam Score</th>
           <th>First Seen</th>
           <th>Created</th>
@@ -37,6 +38,7 @@
           <td>{{ item.url_to|truncatechars:40|default:"-" }}</td>
           <td>{{ item.page_title|default:"-"|truncatechars:35 }}</td>
           <td>{{ item.anchor_text|default:"-"|truncatechars:25 }}</td>
+          <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
           <td>{{ item.backlink_spam_score }}</td>
           <td>{{ item.first_seen|date:"Y-m-d"|default:"-" }}</td>
           <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>

@@ -29,6 +29,17 @@ class Backlink(models.Model):
   first_seen = models.DateTimeField(blank=True, null=True)
   last_seen = models.DateTimeField(blank=True, null=True)
 
+  status = models.CharField(
+    max_length=32,
+    choices=[
+      ('draft', 'Draft'),
+      ('approved', 'Approved'),
+      ('submitted', 'Submitted'),
+      ('rejected', 'Rejected'),
+    ],
+    default='pending',
+  )
+
   created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -62,6 +73,7 @@ class Backlink(models.Model):
       'is_new': self.is_new,
       'first_seen': self.first_seen.isoformat(),
       'last_seen': self.last_seen.isoformat(),
+      'status': self.status,
       'created_at': self.created_at.isoformat(),
     }
 

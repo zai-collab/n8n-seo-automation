@@ -9,6 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 
 from .models import Backlink, Content, Outreach
 
@@ -35,6 +36,15 @@ def backlink_list(request):
   }
   
   return render(request, 'backlink/index.html', context)
+
+
+@staff_member_required
+@require_POST
+def backlink_approve(request):
+  ids = request.POST.get('selected_backlinks', '').strip().split(',')
+  ids = [x.strip() for x in ids if x.strip()]
+  Backlink.objects.filter(pk__in=ids).update(status='approved')
+  return redirect('backlink:backlink_list')
 
 
 @staff_member_required
@@ -89,7 +99,16 @@ def content_list(request):
   }
 
   return render(request, 'content/index.html', context)
-  
+
+
+@staff_member_required
+@require_POST
+def content_approve(request):
+  ids = request.POST.get('selected_content', '').strip().split(',')
+  ids = [x.strip() for x in ids if x.strip()]
+  Content.objects.filter(pk__in=ids).update(status='submitted')
+  return redirect('backlink:content_list')
+
 
 @staff_member_required
 def content_guest_post(request, pk: int):

@@ -15,7 +15,7 @@
     <form method="post" action="{% url 'post:metadata_approve' %}" id="approve-form" class="toolbar-end">
       {% csrf_token %}
       <input type="hidden" name="selected_metadata" id="selected-metadata" />
-      <button class="btn primary" type="submit">Approve Metadata</button>
+      <button class="btn primary" type="submit">Approve All</button>
     </form>
   </div>
 

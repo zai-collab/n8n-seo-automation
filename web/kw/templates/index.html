@@ -15,7 +15,7 @@
     <form method="post" action="{% url 'kw:keyword_approve' %}" id="approve-form" class="toolbar-end">
       {% csrf_token %}
       <input type="hidden" name="selected_keywords" id="selected-keywords" />
-      <button class="btn primary" type="submit">Approve Keywords</button>
+      <button class="btn primary" type="submit">Approve All</button>
     </form>
   </div>
 
