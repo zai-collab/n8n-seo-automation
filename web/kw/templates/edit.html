@@ -3,50 +3,50 @@
 
 {% block content %}
 <div class="card">
-  <div class="section-title">
-    Edit Keyword
+  <div class="card-header">
+    <h1 class="section-title">Edit Keyword</h1>
   </div>
 
   <form method="post">
     {% csrf_token %}
 
-    <div style="margin-bottom:12px;">
-      <div class="label" style="margin-bottom: 8px;">Seed keyword</div>
-      <input type="text" name="seed_keyword" value="{{ keyword.seed_keyword|default_if_none:'' }}" disabled>
+    <div class="form-group">
+      <label class="label" for="seed_keyword">Seed keyword</label>
+      <input id="seed_keyword" type="text" name="seed_keyword" value="{{ keyword.seed_keyword|default_if_none:'' }}" disabled>
     </div>
 
-    <div style="margin-bottom:12px;">
-      <div class="label" style="margin-bottom: 8px;">Keyword</div>
-      <input type="text" name="keyword" value="{{ keyword.keyword|default_if_none:'' }}" required>
+    <div class="form-group">
+      <label class="label" for="keyword">Keyword</label>
+      <input id="keyword" type="text" name="keyword" value="{{ keyword.keyword|default_if_none:'' }}" required>
     </div>
 
-    <div style="margin-bottom:12px;">
-      <div class="label" style="margin-bottom: 8px;">Search Volume</div>
-      <input type="number" name="search_volume" value="{{ keyword.search_volume|default_if_none:0 }}" min="0" step="1">
+    <div class="form-group">
+      <label class="label" for="search_volume">Search Volume</label>
+      <input id="search_volume" type="number" name="search_volume" value="{{ keyword.search_volume|default_if_none:0 }}" min="0" step="1">
     </div>
 
-    <div style="margin-bottom:12px;">
-      <div class="label" style="margin-bottom: 8px;">CPC</div>
-      <input type="number" step="0.01" name="cpc" value="{{ keyword.cpc|default_if_none:0 }}" min="0">
+    <div class="form-group">
+      <label class="label" for="cpc">CPC</label>
+      <input id="cpc" type="number" step="0.01" name="cpc" value="{{ keyword.cpc|default_if_none:0 }}" min="0">
     </div>
 
-    <div style="margin-bottom:16px;">
-      <div class="label" style="margin-bottom: 8px;">Competition</div>
-      <input type="number" step="0.01" name="competition" value="{{ keyword.competition|default_if_none:0 }}" min="0">
+    <div class="form-group">
+      <label class="label" for="competition">Competition</label>
+      <input id="competition" type="number" step="0.01" name="competition" value="{{ keyword.competition|default_if_none:0 }}" min="0">
     </div>
 
-    <div style="margin-bottom:16px;">
-      <div class="label" style="margin-bottom: 8px;">Keyword Difficulty</div>
-      <input type="number" step="0.01" name="keyword_difficulty" value="{{ keyword.keyword_difficulty|default_if_none:0 }}" min="0">
+    <div class="form-group">
+      <label class="label" for="keyword_difficulty">Keyword Difficulty</label>
+      <input id="keyword_difficulty" type="number" step="0.01" name="keyword_difficulty" value="{{ keyword.keyword_difficulty|default_if_none:0 }}" min="0">
     </div>
 
-    <div style="margin-bottom:16px;">
-      <div class="label" style="margin-bottom: 8px;">Search Intent</div>
-      <input type="text" name="search_intent" value="{{ keyword.search_intent|default_if_none:'' }}" placeholder="e.g. informational, navigational, transactional">
+    <div class="form-group">
+      <label class="label" for="search_intent">Search Intent</label>
+      <input id="search_intent" type="text" name="search_intent" value="{{ keyword.search_intent|default_if_none:'' }}" placeholder="e.g. informational, navigational, transactional">
     </div>
 
     <div class="row">
-      <button class="btn" type="submit">Save</button>
+      <button class="btn primary" type="submit">Save</button>
       <a class="btn secondary" href="{% url 'kw:keyword_list' %}">Cancel</a>
     </div>
   </form>

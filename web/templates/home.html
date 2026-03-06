@@ -6,53 +6,47 @@
   <div class="card">
     <div class="label">Keywords</div>
     <div class="value">{{ keyword_count }}</div>
-    <a class="btn" href="{% url 'kw:keyword_list' %}">Manage keywords</a>
+    <a class="btn primary" href="{% url 'kw:keyword_list' %}">Manage keywords</a>
   </div>
 
   <div class="card">
     <div class="label">SERP Metadata</div>
     <div class="value">{{ metadata_count }}</div>
-    <a class="btn" href="{% url 'post:metadata_list' %}">Manage metadata</a>
+    <a class="btn primary" href="{% url 'post:metadata_list' %}">Manage metadata</a>
   </div>
 
   <div class="card">
     <div class="label">Blogs</div>
     <div class="value">{{ blog_count }}</div>
-    <a class="btn" href="{% url 'post:blog_list' %}">Manage blogs</a>
+    <a class="btn primary" href="{% url 'post:blog_list' %}">Manage blogs</a>
   </div>
 
   <div class="card">
     <div class="label">Backlinks</div>
     <div class="value">{{ backlink_count }}</div>
-    <a class="btn" href="{% url 'backlink:backlink_list' %}">Manage backlinks</a>
+    <a class="btn primary" href="{% url 'backlink:backlink_list' %}">Manage backlinks</a>
   </div>
 </div>
 
 <div class="card quick-actions">
-  <div class="section-title">Quick actions</div>
+  <h2 class="section-title">Quick actions</h2>
   <div class="row">
-    <a class="chip" href="">+ Create cluster</a>
-    <a class="chip" href="">+ Add keyword</a>
     <a class="chip" href="/admin/">Admin</a>
   </div>
 </div>
 
-<div class="card quick-actions" style="margin-top:24px;">
-  <div class="section-title">Keyword Research</div>
+<div class="card quick-actions" style="margin-top: 24px;">
+  <h2 class="section-title">Keyword Research</h2>
   <form method="post" action="{% url 'kw:keyword_research' %}">
     {% csrf_token %}
-
-    <div class="row" style="align-items:flex-end; gap:12px;">
+    <div class="row" style="align-items: flex-end; gap: 12px;">
       <div>
-        <div class="label" style="margin-bottom: 15px;">Seed keyword</div>
-        <input type="text" name="keyword" placeholder="e.g. ai music generator" style="min-width:260px;">
+        <label class="label" for="seed-keyword">Seed keyword</label>
+        <input id="seed-keyword" type="text" name="keyword" placeholder="e.g. ai music generator" style="min-width: 260px; margin-top: 6px;" />
       </div>
-      <div>
-        <button class="btn" type="submit">Research</button>
-      </div>
+      <button class="btn primary" type="submit">Research</button>
     </div>
-    
-    <p class="hint" style="margin-top:8px;">
+    <p class="hint" style="margin-top: 12px;">
       Enter a seed keyword to jump straight to clustered results filtered by that topic.
     </p>
   </form>

@@ -3,70 +3,71 @@
 
 {% block content %}
 <div class="card">
-  <div class="section-title">Backlinks</div>
+  <div class="card-header">
+    <h1 class="section-title">Backlinks</h1>
+  </div>
 
-  <div class="row" style="margin-bottom: 14px;">
-    <form method="get" class="row" style="gap: 8px;">
-      <input
-        type="text"
-        name="query"
-        value="{{ query }}"
-        placeholder="Search backlink"
-      />
+  <div class="card-toolbar">
+    <form method="get" class="search-form">
+      <input type="text" name="query" value="{{ query }}" placeholder="Search domain, URL, anchor..." />
       <button class="btn secondary" type="submit">Search</button>
     </form>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Domain From</th>
-        <th>Rank</th>
-        <th>URL To</th>
-        <th>Page Title</th>
-        <th>Anchor</th>
-        <th>Spam Score</th>
-        <th>First Seen</th>
-        <th>Created</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in page.object_list %}
-      <tr>
-        <td>{{ item.domain_from|default:"-" }}</td>
-        <td>{{ item.domain_rank }}</td>
-        <td>{{ item.url_to|truncatechars:40|default:"-" }}</td>
-        <td>{{ item.page_title|default:"-" }}</td>
-        <td>{{ item.anchor_text|default:"-" }}</td>
-        <td>{{ item.backlink_spam_score }}</td>
-        <td>{{ item.first_seen|date:"Y-m-d"|default:"-" }}</td>
-        <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
-        <td style="text-align: right;">
-          <form method="post" action="{% url 'backlink:content_topic' item.id %}" style="display:inline" onsubmit="return confirm('Generate content topic for this backlink?');">
-            {% csrf_token %}
-            <button class="btn primary" type="submit">Topic</button>
-          </form>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="10" class="muted">No Data.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Domain From</th>
+          <th>Rank</th>
+          <th>URL To</th>
+          <th>Page Title</th>
+          <th>Anchor</th>
+          <th>Spam Score</th>
+          <th>First Seen</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page.object_list %}
+        <tr>
+          <td>{{ item.domain_from|default:"-" }}</td>
+          <td>{{ item.domain_rank }}</td>
+          <td>{{ item.url_to|truncatechars:40|default:"-" }}</td>
+          <td>{{ item.page_title|default:"-"|truncatechars:35 }}</td>
+          <td>{{ item.anchor_text|default:"-"|truncatechars:25 }}</td>
+          <td>{{ item.backlink_spam_score }}</td>
+          <td>{{ item.first_seen|date:"Y-m-d"|default:"-" }}</td>
+          <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
+          <td class="table-actions">
+            <div class="btn-group">
+              <form method="post" action="{% url 'backlink:content_topic' item.id %}" style="display:inline" onsubmit="return confirm('Generate content topic for this backlink?');">
+                {% csrf_token %}
+                <button class="btn primary btn-sm" type="submit">Topic</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="table-empty muted">No backlinks yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-  <div class="row" style="justify-content: flex-end; margin-top: 12px;">
-    {% if page.has_previous %}
-      <a class="btn secondary" href="?page={{ page.previous_page_number }}&query={{ query|urlencode }}">Prev</a>
-    {% endif %}
-    <span class="muted" style="margin: 0 10px;">
-      Page {{ page.number }} of {{ page.paginator.num_pages }}
-    </span>
-    {% if page.has_next %}
-      <a class="btn secondary" href="?page={{ page.next_page_number }}&query={{ query|urlencode }}">Next</a>
-    {% endif %}
+  <div class="pagination">
+    <span class="pagination-info">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    <div class="pagination-nav">
+      {% if page.has_previous %}
+      <a class="btn secondary btn-sm" href="?page={{ page.previous_page_number }}&query={{ query|urlencode }}">Prev</a>
+      {% endif %}
+      {% if page.has_next %}
+      <a class="btn secondary btn-sm" href="?page={{ page.next_page_number }}&query={{ query|urlencode }}">Next</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}

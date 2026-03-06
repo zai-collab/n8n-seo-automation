@@ -5,27 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}App{% endblock %} | SEO Automation</title>
   {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="brand">SEO Automation</div>
-      <div class="nav">
-        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
-        <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
-        <a href="/posts/metadata/" class="{% if request.path|slice:':15' == '/posts/metadata' %}active{% endif %}">Metadata</a>
-        <a href="/posts/blogs/" class="{% if request.path|slice:':12' == '/posts/blogs' %}active{% endif %}">Blogs</a>
-        <a href="/backlinks/" class="{% if request.path|slice:':10' == '/backlinks' and request.path|slice:':18' != '/backlinks/content' and request.path|slice:':19' != '/backlinks/outreach' %}active{% endif %}">Backlinks</a>
-        <a href="/backlinks/content/" class="{% if request.path|slice:':18' == '/backlinks/content' %}active{% endif %}">Content</a>
-        <a href="/backlinks/outreach/" class="{% if request.path|slice:':19' == '/backlinks/outreach' %}active{% endif %}">Outreach</a>
-        <a href="/admin/">Admin</a>
+    <header class="topbar">
+      <a href="/" class="brand">SEO Automation</a>
+      <nav class="nav">
+        <div class="nav-main">
+          <a href="/" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
+          <a href="/kw/keywords/" class="{% if request.path|slice:':12' == '/kw/keywords' %}active{% endif %}">Keywords</a>
+          <a href="/posts/metadata/" class="{% if request.path|slice:':15' == '/posts/metadata' %}active{% endif %}">Metadata</a>
+          <a href="/posts/blogs/" class="{% if request.path|slice:':12' == '/posts/blogs' %}active{% endif %}">Blogs</a>
+          <a href="/backlinks/" class="{% if request.path|slice:':10' == '/backlinks' and request.path|slice:':18' != '/backlinks/content' and request.path|slice:':20' != '/backlinks/outreach' %}active{% endif %}">Backlinks</a>
+          <a href="/backlinks/content/" class="{% if request.path|slice:':18' == '/backlinks/content' %}active{% endif %}">Content</a>
+          <a href="/backlinks/outreach/" class="{% if request.path|slice:':20' == '/backlinks/outreach' %}active{% endif %}">Outreach</a>
+          <a href="/admin/">Admin</a>
+        </div>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
-          <button type="submit">Log out</button>
+          <button type="submit" class="btn-logout">Log out</button>
         </form>
-      </div>
-    </div>
+      </nav>
+    </header>
 
     {% block content %}{% endblock %}
   </div>

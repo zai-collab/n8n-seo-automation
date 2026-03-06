@@ -3,76 +3,72 @@
 
 {% block content %}
 <div class="card">
-  <div class="section-title">SERPMetadata</div>
-  <div class="row" style="margin-bottom:14px; justify-content:space-between;">
-    <div class="row">
-      <form method="get" class="row">
-        <input type="text" name="query" value="{{ query }}" placeholder="Search SERP Metadata">
-        <button class="btn secondary" type="submit">Search</button>
-      </form>
-    </div>
+  <div class="card-header">
+    <h1 class="section-title">SERP Metadata</h1>
+  </div>
 
-    <form
-      method="post"
-      action="{% url 'post:metadata_approve' %}"
-      id="approve-form"
-      style="display: inline"
-    >
+  <div class="card-toolbar">
+    <form method="get" class="search-form">
+      <input type="text" name="query" value="{{ query }}" placeholder="Search SERP Metadata" />
+      <button class="btn secondary" type="submit">Search</button>
+    </form>
+    <form method="post" action="{% url 'post:metadata_approve' %}" id="approve-form">
       {% csrf_token %}
       <input type="hidden" name="selected_metadata" id="selected-metadata" />
-      <button class="btn" type="submit">Approve Metadata</button>
+      <button class="btn primary" type="submit">Approve Metadata</button>
     </form>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th><input type="checkbox" id="select-all" title="Select all" /></th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Intent</th>
-        <th>Keyword</th>
-        <th>Created</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in page.object_list %}
-      <tr>
-        <td>
-          <input type="checkbox" class="checkbox" value="{{ item.id }}" />
-        </td>
-        <td>{{ item.title }}</td>
-        <td>{{ item.meta_description }}</td>
-        <td>{{ item.intent }}</td>
-        <td>{{ item.keyword.keyword }}</td>
-        <td class="muted">{{ item.created_at|date:"Y-m-d H:i" }}</td>
-        <td style="text-align:right;">
-          <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
-            {% csrf_token %}
-            <button class="btn primary" type="submit" {% if not item.is_approved %}disabled{% endif %}>Blog Create</button>
-          </form>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5" class="muted">Empty Data.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="row" style="justify-content:flex-end; margin-top:12px;">
-    {% if page.has_previous %}
-      <a class="btn secondary" href="?page={{ page.previous_page_number }}&query={{ query|urlencode }}">Prev</a>
-    {% endif %}
-  
-    <span class="muted" style="margin:0 10px;">
-      Page {{ page.number }} of {{ page.paginator.num_pages }}
-    </span>
-  
-    {% if page.has_next %}
-      <a class="btn secondary" href="?page={{ page.next_page_number }}&query={{ query|urlencode }}">Next</a>
-    {% endif %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="select-all" title="Select all" /></th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Intent</th>
+          <th>Keyword</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page.object_list %}
+        <tr>
+          <td><input type="checkbox" class="checkbox" value="{{ item.id }}" /></td>
+          <td>{{ item.title }}</td>
+          <td>{{ item.meta_description }}</td>
+          <td>{{ item.intent }}</td>
+          <td>{{ item.keyword.keyword }}</td>
+          <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
+          <td class="table-actions">
+            <div class="btn-group">
+              <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
+                {% csrf_token %}
+                <button class="btn primary btn-sm" type="submit" {% if not item.is_approved %}disabled{% endif %}>Blog Create</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="table-empty muted">No metadata yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <span class="pagination-info">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    <div class="pagination-nav">
+      {% if page.has_previous %}
+      <a class="btn secondary btn-sm" href="?page={{ page.previous_page_number }}&query={{ query|urlencode }}">Prev</a>
+      {% endif %}
+      {% if page.has_next %}
+      <a class="btn secondary btn-sm" href="?page={{ page.next_page_number }}&query={{ query|urlencode }}">Next</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 
