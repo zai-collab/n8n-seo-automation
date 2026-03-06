@@ -1,9 +1,16 @@
+import os
+
+from urllib.parse import urljoin
+
+import requests
+
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Backlink
+from .models import Backlink, Content
 
 
 @staff_member_required
@@ -28,3 +35,74 @@ def backlink_list(request):
   }
   
   return render(request, 'backlink/index.html', context)
+
+
+@staff_member_required
+def content_topic(request, pk: int):
+  backlink = get_object_or_404(Backlink, pk=pk)
+  if not backlink:
+    return redirect('backlink:backlink_list')
+
+  data = {
+    'type': 'topic',
+    'target_url': 'https://www.example.com',
+    'author': 'John Doe',
+    'anchor_text': 'Example Anchor Text',
+    'backlink': backlink.serialize(),
+  }
+
+  requests.post(
+    urljoin(os.getenv('N8N_BASE_URL'), os.getenv('N8N_CONTENT_WEBHOOK_URL')),
+    headers={"Webhook-Token": settings.WEBHOOK_TOKEN},
+    json={"data": data},
+    timeout=15
+  )
+
+  return redirect('backlink:backlink_list')
+
+
+@staff_member_required
+def content_list(request):
+  query = request.GET.get('query', '').strip()
+  status = request.GET.get('status', '').strip()
+
+  qs = Content.objects.select_related('backlink').order_by('-created_at')
+
+  if query:
+    qs = qs.filter(
+      Q(title__icontains=query)
+      | Q(anchor_text__icontains=query)
+      | Q(author__icontains=query)
+      | Q(target_url__icontains=query)
+    )
+
+  if status:
+    qs = qs.filter(status=status)
+
+  paginator = Paginator(qs, 10)
+  page = paginator.get_page(request.GET.get('page'))
+
+  context = {
+    'page': page,
+    'query': query,
+    'status': status,
+  }
+
+  return render(request, 'content/index.html', context)
+  
+
+@staff_member_required
+def content_guest_post(request, pk: int):
+  pass
+
+
+@staff_member_required
+def content_outreach(request, pk: int):
+  pass
+
+
+@staff_member_required
+def content_delete(request, pk: int):
+  content = get_object_or_404(Content, pk=pk)
+  content.delete()
+  return redirect('backlink:content_list')

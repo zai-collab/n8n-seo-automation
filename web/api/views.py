@@ -8,7 +8,7 @@ from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from backlink.models import Backlink
+from backlink.models import Backlink, Content
 from post.models import Metadata, Blog
 from kw.models import Keyword
 
@@ -143,8 +143,14 @@ def backlinks_webhook(request):
   if not backlinks:
     return HttpResponseBadRequest("Missing Required Fields")
 
+  keyword_id = data.get("id")
+  keyword = Keyword.objects.get(pk=keyword_id)
+  if not keyword:
+    return HttpResponseBadRequest("Keyword not found")
+
   for backlink in backlinks:
     Backlink.objects.create(
+      keyword=keyword,
       domain_from=backlink.get("domainFrom", ""),
       domain_rank=backlink.get("domainRank") or 0,
       url_from=backlink.get("urlFrom", ""),
@@ -167,3 +173,50 @@ def backlinks_webhook(request):
     )
 
   return HttpResponse("success")
+
+
+@csrf_exempt
+@require_POST
+def content_webhook(request):
+  try:
+    data = json.loads(request.body)
+  except json.JSONDecodeError:
+    return HttpResponseBadRequest("Invalid Request Body")
+
+  type = data.get("type")
+
+  if type == 'topic':
+    topics = data.get("topics")
+
+    if not topics:
+      return HttpResponseBadRequest("Missing Required Fields")
+
+    backlink_id = data.get("id")
+    backlink = Backlink.objects.get(pk=backlink_id)
+    if not backlink:
+      return HttpResponseBadRequest("Backlink not found")
+
+    Content.objects.create(
+      backlink=backlink,
+      topics=topics,
+      anchor_text=data.get("anchorText"),
+      target_url=data.get("targetUrl"),
+      author=data.get("author"),
+    )
+  else:
+    content_id = data.get("id")
+    content = Content.objects.get(pk=content_id)
+    if not content:
+      return HttpResponseBadRequest("Content not found")
+
+    content.title = data.get("title")
+    content.content_html = data.get("contentHtml")
+    content.save()
+  
+  return HttpResponse("success")
+  
+
+@csrf_exempt
+@require_POST
+def outreach_webhook(request):
+  pass

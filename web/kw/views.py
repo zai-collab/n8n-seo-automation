@@ -125,4 +125,6 @@ def keyword_backlinks(request, pk: int):
     json={"data": keyword.serialize()},
     timeout=15
   )
+
+  return redirect("kw:keyword_list")
   

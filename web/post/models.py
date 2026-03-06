@@ -37,7 +37,7 @@ class Metadata(models.Model):
 class Blog(models.Model):
   title = models.CharField(max_length=255)
   slug = models.SlugField(max_length=255)
-  content = models.TextField(blank=True)
+  content_html = models.TextField(blank=True)
 
   featured_image_path = models.CharField(max_length=1024, blank=True, default="")
   featured_image_alt = models.TextField(blank=True, default="")

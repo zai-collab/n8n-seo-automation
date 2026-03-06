@@ -28,6 +28,7 @@
         <th>Spam Score</th>
         <th>First Seen</th>
         <th>Created</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -41,6 +42,12 @@
         <td>{{ item.backlink_spam_score }}</td>
         <td>{{ item.first_seen|date:"Y-m-d"|default:"-" }}</td>
         <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
+        <td style="text-align: right;">
+          <form method="post" action="{% url 'backlink:content_topic' item.id %}" style="display:inline" onsubmit="return confirm('Generate content topic for this backlink?');">
+            {% csrf_token %}
+            <button class="btn primary" type="submit">Topic</button>
+          </form>
+        </td>
       </tr>
       {% empty %}
       <tr>
