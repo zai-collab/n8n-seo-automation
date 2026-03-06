@@ -93,7 +93,21 @@ def content_list(request):
 
 @staff_member_required
 def content_guest_post(request, pk: int):
-  pass
+  content = get_object_or_404(Content, pk=pk)
+  
+  data = {
+    'type': 'guest-post',
+    'content': content.serialize(),
+  }
+
+  requests.post(
+    urljoin(os.getenv('N8N_BASE_URL'), os.getenv('N8N_CONTENT_WEBHOOK_URL')),
+    headers={"Webhook-Token": settings.WEBHOOK_TOKEN},
+    json={"data": data},
+    timeout=15
+  )
+
+  return redirect('backlink:content_list')
 
 
 @staff_member_required

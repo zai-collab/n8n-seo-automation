@@ -1,0 +1,709 @@
+{
+  "name": "Content",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content",
+        "authentication": "headerAuth",
+        "options": {
+          "responseData": "success"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "6f258bbb-63c4-4835-8863-def1f076bfd8",
+      "name": "Webhook",
+      "webhookId": "30ea33c7-7bbd-43d4-8cca-fdf75231624d",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://web:8000/api/v1/content-webhook/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.data[0] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1440,
+        -16
+      ],
+      "id": "9a33161e-0c5a-4338-84ac-e63741d2c9f6",
+      "name": "Upload to Django",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SqzwwY4Hcp7bLSze",
+          "name": "Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f478f634-8870-44e7-b16d-b69654521caf",
+              "name": "systemPrompt",
+              "value": "You are an expert SEO content strategist specializing in guest posting and backlink outreach.  Your task is to generate high-quality guest post topic ideas suitable for publication on authoritative websites.  Guidelines: - Topics must match the style and audience of the target website. - Topics must be informative, practical, and editorial (not promotional). - Topics should naturally relate to the provided keyword. - Avoid clickbait or overly generic topics.  Output Rules: - Respond ONLY with valid JSON. - Do not include explanations or extra text. - Follow the exact schema provided by the user.",
+              "type": "string"
+            },
+            {
+              "id": "b0ec2b10-b7b0-4273-9619-a44422581aa6",
+              "name": "userPrompt",
+              "value": "=Generate guest post topic ideas.\n\nTarget Website:\n{{ $json.domainFrom }}\n\nExample Article On Website:\nTitle: {{ $json.pageTitle }}\nURL: {{ $json.urlFrom }}\n\nTarget Keyword:\n{{ $json.keyword }}\n\nReturn JSON including 3 topics in the following format (No markdown):\n\n{\n  \"topics\": [\"String\"]\n}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -128
+      ],
+      "id": "74b395b0-2ffc-4f89-a027-3758adaa0bd2",
+      "name": "Set Params for Topic"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "926781f9-9fd7-46b8-b686-636931c8a209",
+              "name": "systemPrompt",
+              "value": "You are a professional guest post writer specializing in SEO-friendly blog articles.\n\nYour task is to write high-quality guest post articles that match the style of the target website. The article must be well-structured, informative, and naturally written for human readers.\n\nRules:\n- Output ONLY the article body in HTML.\n- No JSON, no markdown.\n- Do NOT include <html>, <head>, or <body>.\n- Use tags like <h2>, <h3>, <p>, <ul>, <li>, <a>.\n- Insert the backlink naturally using the provided anchor text and URL.\n- Return only the final HTML article.",
+              "type": "string"
+            },
+            {
+              "id": "159d0883-c0f0-49f5-8ee0-a61bbe726f40",
+              "name": "userPrompt",
+              "value": "=Write a guest post article.\n\nTarget Website:\n{{ $json.domainFrom }}\n\nApproved Topic:\n{{ $json.acceptedTopic }}\n\nExample Article:\n{{ $json.pageTitle }}\n\nBacklink:\nURL: {{ $json.targetUrl }}\nAnchor Text: {{ $json.anchorText }}\n\nInstructions:\n- Write a structured article using HTML.\n- Start directly with content (no title wrapper).\n- Use headings and paragraphs.\n- Include the backlink naturally using:\n<a href=\"{{ $json.targetUrl }}\">{{ $json.anchorText }}</a>\n\nReturn ONLY the full HTML article content.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        128
+      ],
+      "id": "f18595ae-c1cb-4fe1-9f11-93a8800fd838",
+      "name": "Set Params for Post"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ff0e91c-270c-46a3-847b-8cf5fa34cd97",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "topic",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "36be76a3-005e-4835-949e-5598731b83c2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "c50d4e83-d2c5-4c3b-a9ab-66f549adc771",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f3bfb1b4-a930-4643-8c8c-58fefae7d2ed",
+              "name": "id",
+              "value": "={{ $json.content.id }}",
+              "type": "number"
+            },
+            {
+              "id": "c4649a76-96fb-4eb1-b0a6-625375f67ef4",
+              "name": "author",
+              "value": "={{ $json.content.author }}",
+              "type": "string"
+            },
+            {
+              "id": "4caa7683-f92d-41ce-87e5-7e2656fa0bfd",
+              "name": "anchorText",
+              "value": "={{ $json.content.anchor_text }}",
+              "type": "string"
+            },
+            {
+              "id": "c17bf598-4b11-497b-88a8-d18b63de582d",
+              "name": "targetUrl",
+              "value": "={{ $json.content.target_url }}",
+              "type": "string"
+            },
+            {
+              "id": "cf273966-fede-4415-a7fd-bfb6cb24d399",
+              "name": "acceptedTopic",
+              "value": "={{ $json.content.accepted_topic }}",
+              "type": "string"
+            },
+            {
+              "id": "bb57e582-fc8b-45ba-8e1a-fa727d20a2d7",
+              "name": "domainFrom",
+              "value": "={{ $json.content.backlink.domain_from }}",
+              "type": "string"
+            },
+            {
+              "id": "cb5fec80-ac64-45ec-bb8d-fdd23638ff2a",
+              "name": "pageTitle",
+              "value": "={{ $json.content.backlink.page_title }}",
+              "type": "string"
+            },
+            {
+              "id": "6acf8adb-6cdc-4069-a0d2-15d82357440b",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        128
+      ],
+      "id": "7f9ba402-abf6-42d9-8154-9478f1401d01",
+      "name": "Prepare for Guest Post"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "942571b6-d0e9-43d1-80aa-e659f98c2231",
+              "name": "domainFrom",
+              "value": "={{ $json.backlink.domain_from }}",
+              "type": "string"
+            },
+            {
+              "id": "8928adba-64f5-4830-8317-7803314db026",
+              "name": "=urlFrom",
+              "value": "={{ $json.backlink.url_from }}",
+              "type": "string"
+            },
+            {
+              "id": "5e6fe72c-8af4-4c04-8d0b-6c7d8909bb95",
+              "name": "pageTitle",
+              "value": "={{ $json.backlink.page_title }}",
+              "type": "string"
+            },
+            {
+              "id": "7b33e0c5-18c4-44ac-9d68-53c8665cc58c",
+              "name": "=keyword",
+              "value": "={{ $json.backlink.keyword.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "d6096cee-d39c-4d33-8939-f6c11ddbec64",
+              "name": "id",
+              "value": "={{ $json.backlink.id }}",
+              "type": "number"
+            },
+            {
+              "id": "4f9f5a97-f3f5-46c4-803b-d56261342f24",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "fc732b53-7a41-46cc-b01f-3458fdbaaeab",
+              "name": "anchorText",
+              "value": "={{ $json.anchor_text }}",
+              "type": "string"
+            },
+            {
+              "id": "951c9c27-eaf0-4a65-8c80-6dc86f4e66f8",
+              "name": "targetUrl",
+              "value": "={{ $json.target_url }}",
+              "type": "string"
+            },
+            {
+              "id": "e42b4c34-a296-4d7e-a0ba-60de9a63c257",
+              "name": "author",
+              "value": "={{ $json.author }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -128
+      ],
+      "id": "017c9d3f-a3a4-42c6-9078-bb8e53503eba",
+      "name": "Prepare for Topic"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e800ab5-f8c8-401e-a45c-8a3f94e312fb",
+              "name": "topics",
+              "value": "={{ $json.result.topics }}",
+              "type": "array"
+            },
+            {
+              "id": "781980d8-15b3-4dc2-b1d9-57e98f71ae42",
+              "name": "type",
+              "value": "={{ $('Prepare for Topic').item.json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "39a2589c-dd1a-471e-bd6e-5051ee0e508f",
+              "name": "id",
+              "value": "={{ $('Prepare for Topic').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2f5b5228-eb3b-445e-b8e9-6e652f1c32d2",
+              "name": "anchorText",
+              "value": "={{ $('Prepare for Topic').item.json.anchorText }}",
+              "type": "string"
+            },
+            {
+              "id": "fd43ef6c-f05a-4a0f-986d-00e1650c543f",
+              "name": "author",
+              "value": "={{ $('Prepare for Topic').item.json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "07e11ee2-f11c-4257-8a1a-96dd5f446951",
+              "name": "targetUrl",
+              "value": "={{ $('Prepare for Topic').item.json.targetUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        -128
+      ],
+      "id": "dd4b2af7-72df-4690-acb9-027de88bd4af",
+      "name": "Set Topic Result"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33b8ad51-4fdf-44b3-9bd3-17bfe312a88a",
+              "name": "contentHtml",
+              "value": "={{ $json.result }}",
+              "type": "string"
+            },
+            {
+              "id": "dbd9d237-52f9-4dc1-b6ac-4e360de09071",
+              "name": "title",
+              "value": "={{ $('Prepare for Guest Post').item.json.acceptedTopic }}",
+              "type": "string"
+            },
+            {
+              "id": "d92f232b-0df3-4de4-b612-370d50be8549",
+              "name": "id",
+              "value": "={{ $('Prepare for Guest Post').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5951012a-23dd-42dc-92a3-a243e6930c49",
+              "name": "type",
+              "value": "={{ $('Prepare for Guest Post').item.json.type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        128
+      ],
+      "id": "a1b75f88-1a21-46e3-9749-eb7fce5b6955",
+      "name": "Set Guest Post Result"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5e9c5f2-1f89-4ae6-90e1-bcb4c56f1563",
+              "name": "result",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        -128
+      ],
+      "id": "07534067-1adf-4ba7-bf19-ab6b0b608986",
+      "name": "GPT Result for Topic"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1f1a386-12bb-407a-a078-f9a1f6c9225d",
+              "name": "result",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        128
+      ],
+      "id": "6f65e7d1-d7e2-4b13-9868-4566e999a83d",
+      "name": "GPT Result for Guest Post"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "={{ $json.systemPrompt }}"
+            },
+            {
+              "content": "={{ $json.userPrompt }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        -128
+      ],
+      "id": "5f9702ce-23dc-410a-85fb-9c1a4d3d79d9",
+      "name": "Topic GPT",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "={{ $json.systemPrompt }}"
+            },
+            {
+              "content": "={{ $json.userPrompt }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        128
+      ],
+      "id": "4483cb06-278d-49b3-9749-c514af7e2a94",
+      "name": "Guest Post GPT",
+      "credentials": {
+        "openAiApi": {
+          "id": "E7BwYwUgebLBmEeH",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "095ded45-3320-48ee-9e21-8c695b649849",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Params for Topic": {
+      "main": [
+        [
+          {
+            "node": "Topic GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Params for Post": {
+      "main": [
+        [
+          {
+            "node": "Guest Post GPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Prepare for Topic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare for Guest Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Guest Post": {
+      "main": [
+        [
+          {
+            "node": "Set Params for Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare for Topic": {
+      "main": [
+        [
+          {
+            "node": "Set Params for Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Topic Result": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Guest Post Result": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT Result for Topic": {
+      "main": [
+        [
+          {
+            "node": "Set Topic Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT Result for Guest Post": {
+      "main": [
+        [
+          {
+            "node": "Set Guest Post Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Topic GPT": {
+      "main": [
+        [
+          {
+            "node": "GPT Result for Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guest Post GPT": {
+      "main": [
+        [
+          {
+            "node": "GPT Result for Guest Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Upload to Django",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "60607ca7-d678-48aa-bbae-028b261b055f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7cd8132a01553208b51af1b6f590e6b713099fddbe627ba38f94e57ddda75156"
+  },
+  "id": "yxb4y05iDIGqQLZy",
+  "tags": []
+}

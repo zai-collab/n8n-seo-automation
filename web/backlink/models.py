@@ -70,6 +70,7 @@ class Content(models.Model):
   backlink = models.OneToOneField(Backlink, on_delete=models.CASCADE, related_name='content')
 
   topics = ArrayField(base_field=models.CharField(max_length=255), default=list, blank=True)
+  accepted_topic = models.CharField(max_length=255, blank=True, null=True)
   title = models.CharField(max_length=255, blank=True, null=True)
   content_html = models.TextField(blank=True, null=True)
   anchor_text = models.CharField(max_length=255, blank=True, null=True)
@@ -94,5 +95,20 @@ class Content(models.Model):
     db_table = 'contents'
 
   def __str__(self):
-    return self.title
+    return self.backlink.url_from
+    
+  def serialize(self):
+    return {
+      'id': self.id,
+      'backlink': self.backlink.serialize(),
+      'topics': self.topics,
+      'accepted_topic': self.accepted_topic,
+      'title': self.title,
+      'content_html': self.content_html,
+      'anchor_text': self.anchor_text,
+      'target_url': self.target_url,
+      'author': self.author,
+      'status': self.status,
+      'created_at': self.created_at.isoformat(),
+    }
     

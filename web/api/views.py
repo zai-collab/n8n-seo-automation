@@ -183,6 +183,7 @@ def content_webhook(request):
   except json.JSONDecodeError:
     return HttpResponseBadRequest("Invalid Request Body")
 
+  data = data.get("data")
   type = data.get("type")
 
   if type == 'topic':
