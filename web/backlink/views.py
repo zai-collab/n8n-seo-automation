@@ -41,9 +41,9 @@ def backlink_list(request):
 @staff_member_required
 @require_POST
 def backlink_approve(request):
-  ids = request.POST.get('selected_backlinks', '').strip().split(',')
-  ids = [x.strip() for x in ids if x.strip()]
-  Backlink.objects.filter(pk__in=ids).update(status='approved')
+  ids = request.POST.get('selected_backlinks', '').split(',')
+  backlinks = Backlink.objects.filter(pk__in=ids)
+  backlinks.update(status='approved')
   return redirect('backlink:backlink_list')
 
 
@@ -104,9 +104,9 @@ def content_list(request):
 @staff_member_required
 @require_POST
 def content_approve(request):
-  ids = request.POST.get('selected_content', '').strip().split(',')
-  ids = [x.strip() for x in ids if x.strip()]
-  Content.objects.filter(pk__in=ids).update(status='submitted')
+  ids = request.POST.get('selected_content', '').split(',')
+  contents = Content.objects.filter(pk__in=ids)
+  contents.update(status='approved')
   return redirect('backlink:content_list')
 
 
@@ -170,6 +170,15 @@ def outreach_list(request):
     'status': status,
   }
   return render(request, 'outreach/index.html', context)
+
+
+@staff_member_required
+@require_POST
+def outreach_approve(request):
+  ids = request.POST.get('selected_outreach', '').split(',')
+  outreachs = Outreach.objects.filter(pk__in=ids)
+  outreachs.update(status='approved')
+  return redirect('backlink:outreach_list')
 
 
 @staff_member_required

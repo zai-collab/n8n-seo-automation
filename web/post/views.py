@@ -42,7 +42,7 @@ def metadata_list(request):
 def metadata_approve(request):
   metadata_ids = request.POST.get('selected_metadata', '').split(',')
   metadata = Metadata.objects.filter(pk__in=metadata_ids)
-  metadata.update(is_approved=True)
+  metadata.update(status='approved')
   return redirect('post:metadata_list')
   
 

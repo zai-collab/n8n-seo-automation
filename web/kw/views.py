@@ -51,8 +51,7 @@ def keyword_edit(request, pk: int):
       keyword_item.cpc = cpc or 0
       keyword_item.competition = competition or 0
       keyword_item.keyword_difficulty = keyword_difficulty or 0
-      keyword_item.is_approved = False
-      keyword_item.is_analyzed = False
+      keyword_item.status = 'pending'
       keyword_item.save()
       return redirect('kw:keyword_list')
 
@@ -75,7 +74,7 @@ def keyword_delete(request, pk: int):
 def keyword_approve(request):
   keyword_ids = request.POST.get('selected_keywords', '').split(',')
   keywords = Keyword.objects.filter(pk__in=keyword_ids)
-  keywords.update(is_approved=True)
+  keywords.update(status='approved')
   return redirect('kw:keyword_list')
 
 

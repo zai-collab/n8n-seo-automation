@@ -21,12 +21,18 @@
     </form>
     <a class="btn secondary" href="{% url 'backlink:content_list' %}">Content</a>
     <a class="btn secondary" href="{% url 'backlink:backlink_list' %}">Backlinks</a>
+    <form method="post" action="{% url 'backlink:outreach_approve' %}" id="approve-form" class="toolbar-end">
+      {% csrf_token %}
+      <input type="hidden" name="selected_outreach" id="selected-outreach" />
+      <button class="btn primary" type="submit">Approve All</button>
+    </form>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
+          <th><input type="checkbox" id="select-all" title="Select all" /></th>
           <th>Content / Domain</th>
           <th>Subject</th>
           <th>Body</th>
@@ -38,6 +44,7 @@
       <tbody>
         {% for item in page.object_list %}
         <tr>
+          <td><input type="checkbox" class="checkbox" value="{{ item.id }}" /></td>
           <td>
             {% firstof item.content.title item.content.backlink.domain_from item.content.backlink.url_from "-" as src %}
             {{ src|truncatechars:40 }}
@@ -57,7 +64,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="table-empty muted">No outreach yet. Trigger from Content list (Outreach button).</td>
+          <td colspan="7" class="table-empty muted">No Data.</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -76,4 +83,28 @@
     </div>
   </div>
 </div>
+<script>
+  (function () {
+    const form = document.getElementById("approve-form");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      const checkboxes = document.querySelectorAll(".checkbox:checked");
+      const selectedIds = Array.from(checkboxes).map((item) => item.value);
+      document.getElementById("selected-outreach").value = selectedIds.join(",");
+      if (selectedIds.length === 0) {
+        alert("Please select at least one outreach to approve.");
+        e.preventDefault();
+      }
+    });
+    
+    const element = document.getElementById("select-all");
+    if (element) {
+      element.addEventListener("change", function () {
+        document.querySelectorAll(".checkbox").forEach(function (cb) {
+          cb.checked = element.checked;
+        });
+      });
+    }
+  })();
+</script>
 {% endblock %}

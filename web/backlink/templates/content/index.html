@@ -19,12 +19,18 @@
       </select>
       <button class="btn secondary" type="submit">Search</button>
     </form>
+    <form method="post" action="{% url 'backlink:content_approve' %}" id="approve-form" class="toolbar-end">
+      {% csrf_token %}
+      <input type="hidden" name="selected_content" id="selected-content" />
+      <button class="btn primary" type="submit">Approve All</button>
+    </form>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
+          <th><input type="checkbox" id="select-all" title="Select all" /></th>
           <th>Domain</th>
           <th>Title</th>
           <th>Topics</th>
@@ -39,6 +45,7 @@
       <tbody>
         {% for item in page.object_list %}
         <tr>
+          <td><input type="checkbox" class="checkbox" value="{{ item.id }}" /></td>
           <td>
             {% firstof item.backlink.domain_from item.backlink.url_from "-" as src %}
             {{ src|truncatechars:35 }}
@@ -71,7 +78,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="9" class="table-empty muted">No content yet. Create from Backlinks (Topic).</td>
+          <td colspan="10" class="table-empty muted">No Data.</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -90,4 +97,29 @@
     </div>
   </div>
 </div>
+<script>
+  (function () {
+    const form = document.getElementById("approve-form");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        const checkboxes = document.querySelectorAll(".checkbox:checked");
+        const selectedIds = Array.from(checkboxes).map((item) => item.value);
+        document.getElementById("selected-content").value = selectedIds.join(",");
+        if (selectedIds.length === 0) {
+          alert("Please select at least one content to approve.");
+          e.preventDefault();
+        }
+      });
+    }
+    
+    const element = document.getElementById("select-all");
+    if (element) {
+      element.addEventListener("change", function () {
+        document.querySelectorAll(".checkbox").forEach(function (cb) {
+          cb.checked = element.checked;
+        });
+      });
+    }
+  })();
+</script>
 {% endblock %}

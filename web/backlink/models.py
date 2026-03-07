@@ -32,6 +32,7 @@ class Backlink(models.Model):
   status = models.CharField(
     max_length=32,
     choices=[
+      ('pending', 'Pending'),
       ('draft', 'Draft'),
       ('approved', 'Approved'),
       ('submitted', 'Submitted'),
@@ -93,6 +94,8 @@ class Content(models.Model):
     max_length=32,
     choices=[
       ('draft', 'Draft'),
+      ('approved', 'Approved'),
+      ('accepted', 'Accepted'),
       ('submitted', 'Submitted'),
       ('published', 'Published'),
       ('rejected', 'Rejected'),
@@ -135,6 +138,7 @@ class Outreach(models.Model):
     choices=[
       ('draft', 'Draft'),
       ('sent', 'Sent'),
+      ('approved', 'Approved'),
       ('accepted', 'Accepted'),
       ('rejected', 'Rejected'),
     ],

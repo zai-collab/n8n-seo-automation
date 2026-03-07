@@ -407,7 +407,8 @@ select {
 }
 
 .status-pending,
-.status-draft {
+.status-draft,
+.status-pending {
   background: rgba(255, 255, 255, 0.08);
   color: var(--muted);
 }
