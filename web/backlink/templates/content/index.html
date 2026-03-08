@@ -63,15 +63,15 @@
             <div class="btn-group">
               <form method="post" action="{% url 'backlink:content_guest_post' item.id %}" style="display:inline" onsubmit="return confirm('Trigger guest post generation for this content?');">
                 {% csrf_token %}
-                <button class="btn primary btn-sm" type="submit">Guest Post</button>
+                <button class="btn primary btn-sm" type="submit" {% if item.status != 'accepted' %}disabled{% endif %}>Guest Post</button>
               </form>
               <form method="post" action="{% url 'backlink:content_outreach' item.id %}" style="display:inline" onsubmit="return confirm('Trigger outreach for this content?');">
                 {% csrf_token %}
-                <button class="btn primary btn-sm" type="submit">Outreach</button>
+                <button class="btn primary btn-sm" type="submit" {% if item.status != 'approved' %}disabled{% endif %}>Outreach</button>
               </form>
               <form method="post" action="{% url 'backlink:content_delete' item.id %}" style="display:inline" onsubmit="return confirm('Delete this content?');">
                 {% csrf_token %}
-                <button class="btn danger btn-sm" type="submit">Delete</button>
+                <button class="btn danger btn-sm" type="submit" {% if item.status != 'draft' %}disabled{% endif %}>Delete</button>
               </form>
             </div>
           </td>
