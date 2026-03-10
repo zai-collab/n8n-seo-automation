@@ -38,6 +38,7 @@
           <td>{{ blog.created_at|date:"Y-m-d H:i" }}</td>
           <td class="table-actions">
             <div class="btn-group">
+              <a class="btn secondary btn-sm" href="{% url 'post:blog_edit' blog.id %}">Edit</a>
               <form method="post" action="{% url 'post:blog_delete' blog.id %}" style="display:inline" onsubmit="return confirm('Delete blog?');">
                 {% csrf_token %}
                 <button class="btn danger btn-sm" type="submit">Delete</button>

@@ -16,6 +16,7 @@ class Keyword(models.Model):
       ('pending', 'Pending'),
       ('approved', 'Approved'),
       ('analyzed', 'Analyzed'),
+      ('tracked', 'Tracked'),
       ('rejected', 'Rejected'),
     ],
     default='pending',

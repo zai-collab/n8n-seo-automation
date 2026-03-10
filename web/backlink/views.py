@@ -102,6 +102,28 @@ def content_list(request):
 
 
 @staff_member_required
+def content_edit(request, pk: int):
+  item = get_object_or_404(Content, pk=pk)
+
+  if request.method == 'POST':
+    item.accepted_topic = request.POST.get('accepted_topic', '').strip()
+    item.title = request.POST.get('title', '').strip()
+    item.content_html = request.POST.get('content_html', '')
+    item.anchor_text = request.POST.get('anchor_text', '').strip()
+    item.target_url = request.POST.get('target_url', '').strip()
+    item.author = request.POST.get('author', '').strip()
+    item.status = 'draft'
+    item.save()
+    return redirect('backlink:content_list')
+
+  context = {
+    'content': item,
+  }
+
+  return render(request, 'content/edit.html', context)
+
+
+@staff_member_required
 @require_POST
 def content_approve(request):
   ids = request.POST.get('selected_content', '').split(',')
@@ -170,6 +192,24 @@ def outreach_list(request):
     'status': status,
   }
   return render(request, 'outreach/index.html', context)
+
+
+@staff_member_required
+def outreach_edit(request, pk: int):
+  item = get_object_or_404(Outreach, pk=pk)
+
+  if request.method == 'POST':
+    item.subject = request.POST.get('subject', '').strip()
+    item.body = request.POST.get('body', '').strip()
+    item.status = 'draft'
+    item.save()
+    return redirect('backlink:outreach_list')
+
+  context = {
+    'outreach': item,
+  }
+
+  return render(request, 'outreach/edit.html', context)
 
 
 @staff_member_required

@@ -45,6 +45,7 @@
           <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
           <td class="table-actions">
             <div class="btn-group">
+              <a class="btn secondary btn-sm" href="{% url 'post:metadata_edit' item.id %}">Edit</a>
               <form method="post" action="{% url 'post:blog_create' item.id %}" style="display:inline" onsubmit="return confirm('Create blog with this metadata?');">
                 {% csrf_token %}
                 <button class="btn primary btn-sm" type="submit" {% if item.status != 'approved' %}disabled{% endif %}>Blog Create</button>

@@ -217,6 +217,8 @@ a:hover {
 .card-toolbar input[type="text"],
 .card-toolbar input[type="number"] {
   min-width: 220px;
+  width: auto;
+  max-width: none;
 }
 
 .card-toolbar select {
@@ -365,7 +367,9 @@ input[type="text"],
 input[type="number"],
 input[type="email"],
 input[type="password"],
-select {
+input[type="url"],
+select,
+textarea {
   padding: 10px 14px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
@@ -375,6 +379,9 @@ select {
   font-family: inherit;
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
+  max-width: 560px;
+  min-width: 200px;
 }
 
 input::placeholder {
@@ -382,7 +389,8 @@ input::placeholder {
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-muted);
 }
@@ -394,6 +402,23 @@ select {
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
+}
+
+/* Number input: style spinner to match dark theme (keep native arrows) */
+input[type="number"] {
+  padding-right: 4px;
+}
+
+/* WebKit: dark box behind native spinner arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  padding: 0 4px;
+  background: var(--line);
+  border-left: 1px solid var(--line-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  opacity: 1;
+  height: 100%;
 }
 
 /* ===== Status badges ===== */

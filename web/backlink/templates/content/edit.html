@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Edit Content{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h1 class="section-title">Edit Content</h1>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="label">Backlink</label>
+      <input type="text" value="{% firstof content.backlink.domain_from content.backlink.url_from '-' %}" disabled class="muted" style="background: var(--bg-elevated); padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--line);">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="accepted_topic">Accepted Topic</label>
+      <input id="accepted_topic" type="text" name="accepted_topic" value="{{ content.accepted_topic|default_if_none:'' }}" placeholder="Accepted topic for this content">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="title">Title</label>
+      <input id="title" type="text" name="title" value="{{ content.title|default_if_none:'' }}" placeholder="Content title">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="content_html">Content</label>
+      <textarea id="content_html" name="content_html" rows="10" placeholder="HTML content">{{ content.content_html|default_if_none:'' }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="anchor_text">Anchor text</label>
+      <input id="anchor_text" type="text" name="anchor_text" value="{{ content.anchor_text|default_if_none:'' }}" placeholder="Link anchor text">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="target_url">Target URL</label>
+      <input id="target_url" type="url" name="target_url" value="{{ content.target_url|default_if_none:'' }}" placeholder="https://example.com">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="author">Author</label>
+      <input id="author" type="text" name="author" value="{{ content.author|default_if_none:'' }}" placeholder="Author name">
+    </div>
+
+    <div class="row">
+      <button class="btn primary" type="submit">Save</button>
+      <a class="btn secondary" href="{% url 'backlink:content_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

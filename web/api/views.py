@@ -86,7 +86,7 @@ def keyword_analyze_webhook(request):
 
 @csrf_exempt
 def keyword_analyze_cron_job_webhook(request):
-  keywords = Keyword.objects.filter(is_approved=True, is_analyzed=False)
+  keywords = Keyword.objects.filter(status='approved')
 
   return JsonResponse({"data": [keyword.serialize() for keyword in keywords]})
 

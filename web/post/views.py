@@ -44,6 +44,25 @@ def metadata_approve(request):
   metadata = Metadata.objects.filter(pk__in=metadata_ids)
   metadata.update(status='approved')
   return redirect('post:metadata_list')
+
+
+@staff_member_required
+def metadata_edit(request, pk: int):
+  item = get_object_or_404(Metadata, pk=pk)
+
+  if request.method == 'POST':
+    item.title = request.POST.get('title', '').strip()
+    item.intent = request.POST.get('intent', '').strip()
+    item.meta_description = request.POST.get('meta_description', '').strip()
+    item.status = 'draft'
+    item.save()
+    return redirect('post:metadata_list')
+
+  context = {
+    'metadata': item,
+  }
+
+  return render(request, 'metadata/edit.html', context)
   
 
 @staff_member_required
@@ -92,6 +111,26 @@ def blog_list(request):
   }
 
   return render(request, 'blog/index.html', context)
+
+
+@staff_member_required
+def blog_edit(request, pk: int):
+  item = get_object_or_404(Blog, pk=pk)
+
+  if request.method == 'POST':
+    item.title = request.POST.get('title', '').strip()
+    item.slug = request.POST.get('slug', '').strip()
+    item.content_html = request.POST.get('content_html', '')
+    item.featured_image_alt = request.POST.get('featured_image_alt', '').strip()
+    item.status = 'draft'
+    item.save()
+    return redirect('post:blog_list')
+  
+  context = {
+    'blog': item,
+  }
+
+  return render(request, 'blog/edit.html', context)
 
 
 @staff_member_required

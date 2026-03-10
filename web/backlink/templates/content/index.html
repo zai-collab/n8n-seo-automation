@@ -61,6 +61,7 @@
           <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
           <td class="table-actions">
             <div class="btn-group">
+              <a class="btn secondary btn-sm" href="{% url 'backlink:content_edit' item.id %}">Edit</a>
               <form method="post" action="{% url 'backlink:content_guest_post' item.id %}" style="display:inline" onsubmit="return confirm('Trigger guest post generation for this content?');">
                 {% csrf_token %}
                 <button class="btn primary btn-sm" type="submit" {% if item.status != 'accepted' %}disabled{% endif %}>Guest Post</button>

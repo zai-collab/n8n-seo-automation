@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Edit Metadata{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h1 class="section-title">Edit Metadata</h1>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="label" for="title">Title</label>
+      <input id="title" type="text" name="title" value="{{ metadata.title|default_if_none:'' }}" required>
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="intent">Intent</label>
+      <input id="intent" type="text" name="intent" value="{{ metadata.intent|default_if_none:'' }}" placeholder="e.g. informational, commercial">
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="meta_description">Meta description</label>
+      <textarea id="meta_description" name="meta_description" rows="4" placeholder="Meta description for SERP">{{ metadata.meta_description|default_if_none:'' }}</textarea>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" type="submit">Save</button>
+      <a class="btn secondary" href="{% url 'post:metadata_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

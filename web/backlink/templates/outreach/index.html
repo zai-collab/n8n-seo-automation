@@ -19,8 +19,6 @@
       </select>
       <button class="btn secondary" type="submit">Search</button>
     </form>
-    <a class="btn secondary" href="{% url 'backlink:content_list' %}">Content</a>
-    <a class="btn secondary" href="{% url 'backlink:backlink_list' %}">Backlinks</a>
     <form method="post" action="{% url 'backlink:outreach_approve' %}" id="approve-form" class="toolbar-end">
       {% csrf_token %}
       <input type="hidden" name="selected_outreach" id="selected-outreach" />
@@ -55,6 +53,7 @@
           <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
           <td class="table-actions">
             <div class="btn-group">
+              <a class="btn secondary btn-sm" href="{% url 'backlink:outreach_edit' item.id %}">Edit</a>
               <form method="post" action="{% url 'backlink:outreach_delete' item.id %}" style="display:inline" onsubmit="return confirm('Delete this outreach?');">
                 {% csrf_token %}
                 <button class="btn danger btn-sm" type="submit">Delete</button>
