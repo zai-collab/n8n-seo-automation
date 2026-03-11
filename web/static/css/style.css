@@ -499,8 +499,22 @@ input[type="number"]::-webkit-inner-spin-button {
 /* ===== Grid (dashboard) ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Clickable metric cards */
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.card-link:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: var(--line-soft);
 }
 
 .quick-actions {

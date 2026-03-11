@@ -3,29 +3,35 @@
 
 {% block content %}
 <div class="grid">
-  <div class="card">
+  <a href="{% url 'kw:keyword_list' %}" class="card card-link">
     <div class="label">Keywords</div>
     <div class="value">{{ keyword_count }}</div>
-    <a class="btn primary" href="{% url 'kw:keyword_list' %}">Manage keywords</a>
-  </div>
+  </a>
 
-  <div class="card">
+  <a href="{% url 'post:metadata_list' %}" class="card card-link">
     <div class="label">SERP Metadata</div>
     <div class="value">{{ metadata_count }}</div>
-    <a class="btn primary" href="{% url 'post:metadata_list' %}">Manage metadata</a>
-  </div>
+  </a>
 
-  <div class="card">
+  <a href="{% url 'post:blog_list' %}" class="card card-link">
     <div class="label">Blogs</div>
     <div class="value">{{ blog_count }}</div>
-    <a class="btn primary" href="{% url 'post:blog_list' %}">Manage blogs</a>
-  </div>
+  </a>
 
-  <div class="card">
+  <a href="{% url 'backlink:backlink_list' %}" class="card card-link">
     <div class="label">Backlinks</div>
     <div class="value">{{ backlink_count }}</div>
-    <a class="btn primary" href="{% url 'backlink:backlink_list' %}">Manage backlinks</a>
-  </div>
+  </a>
+
+  <a href="{% url 'backlink:content_list' %}" class="card card-link">
+    <div class="label">Content</div>
+    <div class="value">{{ content_count }}</div>
+  </a>
+
+  <a href="{% url 'backlink:outreach_list' %}" class="card card-link">
+    <div class="label">Outreach</div>
+    <div class="value">{{ outreach_count }}</div>
+  </a>
 </div>
 
 <div class="card quick-actions">
